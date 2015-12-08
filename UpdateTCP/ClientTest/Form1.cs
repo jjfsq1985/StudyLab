@@ -128,7 +128,7 @@ namespace ClientTest
                 obj.eType = (UpdateFileType)eType;
                 obj.strVersion = strVer;
                 allUpdate.Add(obj);
-                i += VerLen + 3; //多带一个'\0'
+                i += VerLen + 2;
             }
             if (allUpdate.Count <= 0)
                 return;
@@ -188,7 +188,7 @@ namespace ClientTest
             byte crcHigh = 0;
             byte crcLow = 0;
 
-            for (int i = nIndex; i < nLen; i++)
+            for (int i = nIndex; i < nIndex+nLen; i++)
             {
                 crcHigh ^= data[i];
                 for (int j = 0; j < 8; j++)

@@ -108,13 +108,12 @@ namespace AutoUpdate
         {
             if (string.IsNullOrEmpty(fileInfo.FileVersion))
                 return null;
-            int nLen = fileInfo.FileVersion.Length + 3;
+            int nLen = fileInfo.FileVersion.Length + 2;
             byte[] retVal = new byte[nLen];
             retVal[0] = (byte)fileInfo.eType;
             retVal[1] = (byte)fileInfo.FileVersion.Length;
             byte[] VerData = Encoding.ASCII.GetBytes(fileInfo.FileVersion);
-            Buffer.BlockCopy(VerData, 0, retVal, 2, VerData.Length);
-            retVal[nLen - 1] = 0x00;//结束符
+            Buffer.BlockCopy(VerData, 0, retVal, 2, VerData.Length);            
             return retVal;
         }
 
@@ -327,7 +326,7 @@ namespace AutoUpdate
         private byte GetXorValue(List<byte> byteData, int nIndex, int nLen)
         {
             byte ret = 0;
-            for (int i = nIndex; i < nLen; i++)
+            for (int i = nIndex; i < nIndex + nLen; i++)
             {
                 ret ^= byteData[i];
             }
@@ -425,7 +424,7 @@ namespace AutoUpdate
             byte crcHigh = 0;
             byte crcLow = 0;
 
-            for (int i = nIndex; i < nLen; i++)
+            for (int i = nIndex; i < nIndex+nLen; i++)
             {
                 crcHigh ^= data[i];
                 for (int j = 0; j < 8; j++)
