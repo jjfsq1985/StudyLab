@@ -36,7 +36,7 @@ namespace AutoUpdate
         List<UpdateFileParam> lstUpdateFile = new List<UpdateFileParam>();
         BuildUpdateData updateObj = new BuildUpdateData();
 
-        public delegate void RemoteIPHandler(string strContent);
+        public delegate void SetLstItem(string strContent);
 
         //UDP广播线程参数
         public class UpdThreadParam
@@ -130,8 +130,9 @@ namespace AutoUpdate
             bytePacket.Add(ipAddr[2]);
             bytePacket.Add(ipAddr[3]);
             byte[] port = BitConverter.GetBytes((ushort)param.TcpPort);
+            //高字节在前
+            bytePacket.Add(port[1]);
             bytePacket.Add(port[0]);
-            bytePacket.Add(port[1]);            
 
             ushort VerDataLen = 0;
             List<byte> byteVer = new List<byte>();
@@ -146,8 +147,9 @@ namespace AutoUpdate
             }
 
             byte[] byteVerLen = BitConverter.GetBytes(VerDataLen);
+            //高字节在前
+            bytePacket.Add(byteVerLen[1]);
             bytePacket.Add(byteVerLen[0]);
-            bytePacket.Add(byteVerLen[1]); 
             bytePacket.AddRange(byteVer);
             bytePacket.Add(0x03);
             byte xorByte = GetXorValue(bytePacket,1,bytePacket.Count-2);
@@ -248,8 +250,8 @@ namespace AutoUpdate
         {
             if (this.lstClient.InvokeRequired)
             {
-                RemoteIPHandler RemoteIp = new RemoteIPHandler(SetLstContent);
-                this.Invoke(RemoteIp, new object[] { strContent });
+                SetLstItem lstItem = new SetLstItem(SetLstContent);
+                this.Invoke(lstItem, new object[] { strContent });
             }
             else
             {
@@ -303,17 +305,21 @@ namespace AutoUpdate
                 //文件名固定n-ver.bin(如键盘程序为2-K.ZHY.1.23.48.bin)
                 int nPos = strFileName.LastIndexOf("\\") + 1;
                 string strFileParse = strFileName.Substring(nPos, strFileName.LastIndexOf(".bin") - nPos);
-                int nType = Convert.ToInt32(strFileParse.Substring(0, 1));
-                string strVersion = strFileParse.Substring(2, strFileParse.Length - 2);
-                if (nType >= 1 && nType <= 4)
+                int nSplit = strFileParse.IndexOf("-");
+                if (nSplit != -1)
                 {
-                    UpdateFileParam par = new UpdateFileParam();
-                    FileInfo fileInfo = new FileInfo(strFileName);
-                    par.eType = (UpdateFileType)nType;
-                    par.strFileFullPath = strFileName;
-                    par.FileLen = Convert.ToInt32(fileInfo.Length);
-                    par.FileVersion = strVersion;
-                    lstUpdateFile.Add(par);
+                    int nType = Convert.ToInt32(strFileParse.Substring(0, nSplit));
+                    string strVersion = strFileParse.Substring(nSplit + 1, strFileParse.Length - 2);
+                    if (nType >= 1 && nType <= 4)
+                    {
+                        UpdateFileParam par = new UpdateFileParam();
+                        FileInfo fileInfo = new FileInfo(strFileName);
+                        par.eType = (UpdateFileType)nType;
+                        par.strFileFullPath = strFileName;
+                        par.FileLen = Convert.ToInt32(fileInfo.Length);
+                        par.FileVersion = strVersion;
+                        lstUpdateFile.Add(par);
+                    }
                 }
             }
         }
@@ -467,7 +473,7 @@ namespace AutoUpdate
                             break;
                         if (DeviceData[8] != 0x00 && m_nUpdateDevCount > 0)
                             m_nUpdateDevCount--;
-                        int nOffset = BitConverter.ToInt32(DeviceData, 9);
+                        int nOffset = BigEndianToInt32(DeviceData, 9);
                         if (nOffset < UpdatePar.FileLen && m_nUpdateDevCount > 0)
                         {
                             byte[] buildData = updateObj.CreateBody(UpdatePar, nOffset, nSegmentSize);
@@ -481,6 +487,18 @@ namespace AutoUpdate
             }
 
         }
+
+        private int BigEndianToInt32(byte[] Data, int nIndex)
+        {
+            int nRetData = 0;
+            for(int i=nIndex; i< nIndex+4; i++)
+            {
+                nRetData <<= 8;
+                nRetData += Data[i];                
+            }
+            return nRetData;
+        }
+
 
         private byte[] BuildSendData(byte[] srcData)
         {

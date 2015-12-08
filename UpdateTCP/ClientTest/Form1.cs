@@ -55,7 +55,7 @@ namespace ClientTest
                 byte[] data = UdpObj.Receive(ref recvEP);
                 if (data != null && data.Length > 9)
                 {
-                    int nlen = (data[8]<< 8) + data[7];
+                    int nlen = (data[7]<< 8) + data[8];
                     //计算多一个异或校验
                     if(data.Length >= nlen + 11 && data[0] == 0x02 && data[nlen + 9] == 0x03)
                     {
@@ -64,7 +64,7 @@ namespace ClientTest
                             ip[1] = data[2];
                             ip[2] = data[3];
                             ip[3] = data[4];
-                            int nPort = (data[6] << 8) + data[5];
+                            int nPort = (data[5] << 8) + data[6];
                             IPAddress ipAddr = new IPAddress(ip);
                             byte[] verData = new byte[nlen];
                             Buffer.BlockCopy(data, 9, verData, 0, nlen);                            
@@ -242,8 +242,10 @@ namespace ClientTest
             buildData[1] = 0;
             buildData[2] = 0;
             buildData[3] = 0;
+            //BCD
             buildData[4] = 0x00;
             buildData[5] = 0x02;
+            //
             buildData[6] = 0x2D;
             buildData[7] = (byte)nType;
             byte[] sendData = BuildSendData(buildData);        
@@ -258,13 +260,18 @@ namespace ClientTest
             buildData[1] = 0;
             buildData[2] = 0;
             buildData[3] = 0;
+            //BCD
             buildData[4] = 0x00;
             buildData[5] = 0x07;
+            //
             buildData[6] = 0x2E;
             buildData[7] = (byte)nType;
             buildData[8] = bCompleted ? (byte)1 : (byte)0;
             byte[] fileSeek = BitConverter.GetBytes(nFileOffset);
-            Buffer.BlockCopy(fileSeek, 0, buildData, 9, 4);
+            buildData[9] = fileSeek[3];
+            buildData[10] = fileSeek[2];
+            buildData[11] = fileSeek[1];
+            buildData[12] = fileSeek[0];
             byte[] sendData = BuildSendData(buildData);
             NetworkStream stream = m_Client.GetStream();
             stream.Write(sendData, 0, sendData.Length);
@@ -448,6 +455,17 @@ namespace ClientTest
             }
         }
 
+        private int BigEndianToInt32(byte[] Data, int nIndex)
+        {
+            int nRetData = 0;
+            for (int i = nIndex; i < nIndex + 4; i++)
+            {
+                nRetData <<= 8;
+                nRetData += Data[i];
+            }
+            return nRetData;
+        }
+
         private void DealwithData(byte[] DeviceData)
         {
             int nLen = (int)BcdToUInt16(DeviceData,4);            
@@ -459,7 +477,7 @@ namespace ClientTest
                         UpdateFileType eFileType = (UpdateFileType)DeviceData[7];
                         if (DeviceData[8] != 0)
                             break;
-                        int nFileSize = BitConverter.ToInt32(DeviceData, 9);
+                        int nFileSize = BigEndianToInt32(DeviceData, 9);
                         FileSizeToList(eFileType, nFileSize);
                         m_bResponseTcp = true;
                     }
@@ -468,7 +486,7 @@ namespace ClientTest
                     {
                         UpdateFileType eFileType = (UpdateFileType)DeviceData[7];
                         string strFileName = GetFileName(eFileType);
-                        int nOffset = BitConverter.ToInt32(DeviceData, 8);
+                        int nOffset = BigEndianToInt32(DeviceData, 8);
                         int nFileSize = GetFileSize(eFileType);
                         if (nOffset < nFileSize && !string.IsNullOrEmpty(strFileName))
                         {

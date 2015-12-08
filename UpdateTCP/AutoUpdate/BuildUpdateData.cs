@@ -17,6 +17,7 @@ namespace AutoUpdate
             header[2] = 0x00;
             header[3] = 0; //帧号
             byte[] validLen = UInt16ToBcd((ushort)9);//命令字2D有效数据长度9
+            //BCD
             header[4] = validLen[0];
             header[5] = validLen[1];
             //有效数据
@@ -24,13 +25,13 @@ namespace AutoUpdate
             header[7] = (byte)FilePar.eType;
             header[8] = nUpdateDevCnt > 0 ? (byte)2 : (byte)0;
             byte[] FileSize = BitConverter.GetBytes(FilePar.FileLen);
-            header[9] = FileSize[0];
-            header[10] = FileSize[1];
-            header[11] = FileSize[2];
-            header[12] = FileSize[3];
+            header[9] = FileSize[3];
+            header[10] = FileSize[2];
+            header[11] = FileSize[1];
+            header[12] = FileSize[0];
             byte[] segmentSize = BitConverter.GetBytes((UInt16)nSegmentSize);
-            header[13] = segmentSize[0];
-            header[14] = segmentSize[1];
+            header[13] = segmentSize[1];
+            header[14] = segmentSize[0];
             return header;
         }
 
@@ -72,10 +73,10 @@ namespace AutoUpdate
             bodyData[6] = 0x2E;
             bodyData[7] = (byte)FilePar.eType;
             byte[] byteOffset = BitConverter.GetBytes(nOffset);
-            bodyData[8] = byteOffset[0];
-            bodyData[9] = byteOffset[1];
-            bodyData[10] = byteOffset[2];
-            bodyData[11] = byteOffset[3];
+            bodyData[8] = byteOffset[3];
+            bodyData[9] = byteOffset[2];
+            bodyData[10] = byteOffset[1];
+            bodyData[11] = byteOffset[0];
             byte[] fileData = ReadBinFile(FilePar.strFileFullPath,nOffset,nBodyLen);                
             Buffer.BlockCopy(fileData, 0, bodyData, 12, fileData.Length);
             //最后一包使用实际长度

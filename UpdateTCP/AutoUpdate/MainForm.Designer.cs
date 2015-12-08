@@ -85,25 +85,26 @@
             // LabelPrompt
             // 
             this.LabelPrompt.AutoSize = true;
-            this.LabelPrompt.Location = new System.Drawing.Point(41, 153);
+            this.LabelPrompt.Location = new System.Drawing.Point(23, 307);
             this.LabelPrompt.Name = "LabelPrompt";
-            this.LabelPrompt.Size = new System.Drawing.Size(0, 12);
+            this.LabelPrompt.Size = new System.Drawing.Size(29, 12);
             this.LabelPrompt.TabIndex = 5;
+            this.LabelPrompt.Text = "Info";
             // 
             // lstClient
             // 
             this.lstClient.FormattingEnabled = true;
             this.lstClient.ItemHeight = 12;
-            this.lstClient.Location = new System.Drawing.Point(25, 142);
+            this.lstClient.Location = new System.Drawing.Point(25, 132);
             this.lstClient.Name = "lstClient";
-            this.lstClient.Size = new System.Drawing.Size(298, 208);
+            this.lstClient.Size = new System.Drawing.Size(298, 160);
             this.lstClient.TabIndex = 6;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(335, 368);
+            this.ClientSize = new System.Drawing.Size(335, 330);
             this.Controls.Add(this.lstClient);
             this.Controls.Add(this.LabelPrompt);
             this.Controls.Add(this.textUdpPort);
