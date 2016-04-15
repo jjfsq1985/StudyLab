@@ -1,0 +1,47 @@
+// socx.idl : socx 的 IDL 源
+//
+
+// 此文件将由 MIDL 工具处理以
+// 产生类型库(socx.tlb)和封送处理代码。
+
+#include "olectl.h"
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(AA3713C8-9532-430D-9704-03C6DB0E5536),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface Isctrls : IDispatch{
+    [id(1), helpstring("addfunc")] HRESULT addparam([in] LONG lparam1, LONG lparam2);
+};
+
+[
+	uuid(2988D132-49BC-416E-BE60-C688AB16A377),
+	version(1.0),
+]
+library socxLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(CDCADCA6-185F-4451-B282-59922BA0DDFE)		
+	]
+	dispinterface _IsctrlsEvents
+	{
+		properties:
+		methods:
+	};
+	[
+		uuid(06CE8CE1-EA67-4BFD-9BEE-3B0B79712751),		
+		control
+	]
+	coclass sctrls
+	{
+		[default] interface Isctrls;
+		[default, source] dispinterface _IsctrlsEvents;
+	};
+};
+
