@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BrowseItemsDlg</class>
+ <widget class="QDialog" name="BrowseItemsDlg">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>767</width>
+    <height>384</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>BrowseItemsDlg</string>
+  </property>
+  <widget class="QTableWidget" name="tableItemProp">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>10</y>
+     <width>521</width>
+     <height>361</height>
+    </rect>
+   </property>
+   <column>
+    <property name="text">
+     <string>ID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Describe</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>DataType</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Value</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>ItemID</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QTreeWidget" name="treeGroups">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>221</width>
+     <height>361</height>
+    </rect>
+   </property>
+   <column>
+    <property name="text">
+     <string>Groups</string>
+    </property>
+   </column>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>treeGroups</tabstop>
+  <tabstop>tableItemProp</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
