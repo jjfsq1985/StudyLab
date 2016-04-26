@@ -28,21 +28,46 @@
     </property>
    </column>
   </widget>
-  <widget class="QListWidget" name="opcitemList">
+  <widget class="QTableWidget" name="opcitemList">
    <property name="geometry">
     <rect>
-     <x>300</x>
-     <y>30</y>
-     <width>491</width>
-     <height>261</height>
+     <x>290</x>
+     <y>40</y>
+     <width>501</width>
+     <height>311</height>
     </rect>
    </property>
+   <column>
+    <property name="text">
+     <string>ItemID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Value</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Quality</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Time Stamp</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Result</string>
+    </property>
+   </column>
   </widget>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>590</x>
-     <y>340</y>
+     <x>570</x>
+     <y>360</y>
      <width>156</width>
      <height>23</height>
     </rect>

@@ -16,8 +16,8 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QHeaderView>
-#include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QTableWidget>
 #include <QtWidgets/QTreeWidget>
 
 QT_BEGIN_NAMESPACE
@@ -26,7 +26,7 @@ class Ui_DlgOpcServer
 {
 public:
     QTreeWidget *OpcGrouptree;
-    QListWidget *opcitemList;
+    QTableWidget *opcitemList;
     QDialogButtonBox *buttonBox;
     QPushButton *btnconnect;
     QPushButton *btnDisconnect;
@@ -39,12 +39,24 @@ public:
         OpcGrouptree = new QTreeWidget(DlgOpcServer);
         OpcGrouptree->setObjectName(QStringLiteral("OpcGrouptree"));
         OpcGrouptree->setGeometry(QRect(9, 40, 271, 351));
-        opcitemList = new QListWidget(DlgOpcServer);
+        opcitemList = new QTableWidget(DlgOpcServer);
+        if (opcitemList->columnCount() < 5)
+            opcitemList->setColumnCount(5);
+        QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
+        opcitemList->setHorizontalHeaderItem(0, __qtablewidgetitem);
+        QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
+        opcitemList->setHorizontalHeaderItem(1, __qtablewidgetitem1);
+        QTableWidgetItem *__qtablewidgetitem2 = new QTableWidgetItem();
+        opcitemList->setHorizontalHeaderItem(2, __qtablewidgetitem2);
+        QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
+        opcitemList->setHorizontalHeaderItem(3, __qtablewidgetitem3);
+        QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
+        opcitemList->setHorizontalHeaderItem(4, __qtablewidgetitem4);
         opcitemList->setObjectName(QStringLiteral("opcitemList"));
-        opcitemList->setGeometry(QRect(300, 30, 491, 261));
+        opcitemList->setGeometry(QRect(290, 40, 501, 311));
         buttonBox = new QDialogButtonBox(DlgOpcServer);
         buttonBox->setObjectName(QStringLiteral("buttonBox"));
-        buttonBox->setGeometry(QRect(590, 340, 156, 23));
+        buttonBox->setGeometry(QRect(570, 360, 156, 23));
         buttonBox->setOrientation(Qt::Horizontal);
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
         buttonBox->setCenterButtons(true);
@@ -67,6 +79,16 @@ public:
         DlgOpcServer->setWindowTitle(QApplication::translate("DlgOpcServer", "Dialog", 0));
         QTreeWidgetItem *___qtreewidgetitem = OpcGrouptree->headerItem();
         ___qtreewidgetitem->setText(0, QApplication::translate("DlgOpcServer", "Groups", 0));
+        QTableWidgetItem *___qtablewidgetitem = opcitemList->horizontalHeaderItem(0);
+        ___qtablewidgetitem->setText(QApplication::translate("DlgOpcServer", "ItemID", 0));
+        QTableWidgetItem *___qtablewidgetitem1 = opcitemList->horizontalHeaderItem(1);
+        ___qtablewidgetitem1->setText(QApplication::translate("DlgOpcServer", "Value", 0));
+        QTableWidgetItem *___qtablewidgetitem2 = opcitemList->horizontalHeaderItem(2);
+        ___qtablewidgetitem2->setText(QApplication::translate("DlgOpcServer", "Quality", 0));
+        QTableWidgetItem *___qtablewidgetitem3 = opcitemList->horizontalHeaderItem(3);
+        ___qtablewidgetitem3->setText(QApplication::translate("DlgOpcServer", "Time Stamp", 0));
+        QTableWidgetItem *___qtablewidgetitem4 = opcitemList->horizontalHeaderItem(4);
+        ___qtablewidgetitem4->setText(QApplication::translate("DlgOpcServer", "Result", 0));
         btnconnect->setText(QApplication::translate("DlgOpcServer", "Connect", 0));
         btnDisconnect->setText(QApplication::translate("DlgOpcServer", "Disconnect", 0));
     } // retranslateUi

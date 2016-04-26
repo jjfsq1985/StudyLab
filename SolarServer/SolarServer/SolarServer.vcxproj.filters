@@ -95,6 +95,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_dlgaddgroup.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="dlgadditems.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_dlgadditems.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_dlgadditems.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -119,6 +128,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_dlgaddgroup.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_dlgadditems.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -154,6 +166,12 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="dlgaddgroup.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dlgadditems.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dlgadditems.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>

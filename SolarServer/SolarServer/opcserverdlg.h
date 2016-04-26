@@ -5,6 +5,8 @@
 #include "ui_opcserverdlg.h"
 
 #include "dlgaddgroup.h"
+#include "dlgadditems.h"
+
 
 class OPCServerDlg : public QDialog
 {
@@ -27,9 +29,11 @@ private:
     void BrowserItems();
     void DelGroup();
     void AddItems();
+    void RemoveItem();
 
 private:
-    vector<GroupParam> m_vecGroups;
+    map<wstring, vector<ItemInfo> > m_mapItems;
+     vector<GroupParam> m_vecGroups;
     class OpcCtrl *m_pOpcCtrl;
 private:
     QMenu *m_pContextMenu;
@@ -37,6 +41,7 @@ private:
     QAction *m_pBrowserItems;
     QAction *m_pDelGroup;
     QAction *m_pAddItems;
+    QAction *m_pRemoveItem;
     Ui::DlgOpcServer ui;
 };
 

@@ -31,9 +31,14 @@ public:
 public:
     bool AddGroup(_bstr_t groupName, LONG UpdateRate, bool bSubscribed);
     bool RemoveGroup(_bstr_t groupName);
-
+    bool AddOpcItems(vector<_bstr_t> vecItemsId,vector<LONG>& vecServerHandle, vector<LONG>& vecResult);
+    bool AddOpcItem(_bstr_t ItemID,LONG& lSvrHandle,LONG& lResult);
+    bool RemoveItems(vector<LONG> vecItemsId);
 
 private:
+    LONG NextHandle();
+private:
+    LONG m_nCount;
     IUnknown *m_pUnk;
     ATL::CComPtr<IOPCGroup> m_ActiveOPCGroup;
 };
