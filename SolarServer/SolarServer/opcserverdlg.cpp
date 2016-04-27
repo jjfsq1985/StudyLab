@@ -156,8 +156,30 @@ void OPCServerDlg::AddItems()
             child->setData(0, Qt::UserRole, QVariant((*it).OpcItemSvrHandle));
             curitem->addChild(child);
         }
-        m_mapItems[strGroup].assign(vecAddItems.begin(), vecAddItems.end());      
+        vector<ItemInfo>& vecSelectedItems = m_mapItems[strGroup];
+        vecSelectedItems.assign(vecAddItems.begin(), vecAddItems.end());
+
+        ui.opcitemList->setRowCount(vecSelectedItems.size());
+        int nRow = 0;
+        for (vector<ItemInfo>::iterator it = vecSelectedItems.begin(); it != vecSelectedItems.end(); it++)
+        {
+            wstring strId = (*it).strOpcItemId;
+            QTableWidgetItem *pTableItem = new QTableWidgetItem(QString::fromStdWString(strId));
+            ui.opcitemList->setItem(nRow, 0, pTableItem);
+            nRow++;
+        }
+
+        m_pOpcCtrl->SetOpcDataChange(this,&OPCServerDlg::ResponseDataChange);
+
     }
+}
+
+void CALLBACK OPCServerDlg::ResponseDataChange(void *pSrcCtrl, long NumItems, const  vector<long>& vecClientHandle, const vector<VARIANT>& vecData, const vector<long>& vecQuality, const vector<SYSTEMTIME>& vecStamp)
+{
+    if (pSrcCtrl == NULL)
+        return;
+    OPCServerDlg *pDlg = (OPCServerDlg *)pSrcCtrl;
+    pDlg->EventResponse_DataChange(NumItems, vecClientHandle, vecData, vecQuality, vecStamp);
 }
 
 void OPCServerDlg::RemoveItem()
@@ -181,4 +203,48 @@ void OPCServerDlg::RemoveItem()
             break;
         }
     }
+}
+
+int OPCServerDlg::GetItemIndexInVector(LONG nClientHandle, const vector<ItemInfo>& vecItem)
+{
+    int nRow = -1;
+    int nIndex = 0;
+    for (vector<ItemInfo>::const_iterator it = vecItem.begin(); it != vecItem.end(); it++)
+    {
+        if ((*it).OpcItemClientHandle == nClientHandle)
+        {
+            nRow = nIndex;
+            break;
+        }
+        nIndex++;
+    }
+    return nRow;
+
+}
+
+void OPCServerDlg::EventResponse_DataChange(long NumItems, const  vector<long>& vecClientHandle, const vector<VARIANT>& vecData, const vector<long>& vecQuality, const vector<SYSTEMTIME>& vecStamp)
+{
+    if (NumItems <= 0)
+        return;
+    QTableWidgetItem *pTableItem = NULL;
+    for (map<wstring, vector<ItemInfo> >::iterator itfind = m_mapItems.begin(); itfind != m_mapItems.end(); itfind++)
+    {
+        vector<ItemInfo>& vecSelectedItems = itfind->second;
+        for (int i = 0; i < NumItems; i++)
+        {
+            int nRow = GetItemIndexInVector(vecClientHandle[i], vecSelectedItems);
+            if (nRow >= 0)
+            {
+                QString strValue = m_pOpcCtrl->GetDataValue(vecData[nRow]);
+                pTableItem = new QTableWidgetItem(strValue);
+                ui.opcitemList->setItem(nRow, 1, pTableItem);
+                pTableItem = new QTableWidgetItem(QString("%1").arg(vecQuality[nRow]));
+                ui.opcitemList->setItem(nRow, 2, pTableItem);
+                QString strTime = m_pOpcCtrl->GetTimeStamp(vecStamp[nRow]);
+                pTableItem = new QTableWidgetItem(strTime);
+                ui.opcitemList->setItem(nRow, 3, pTableItem);
+            }
+        }
+    }
+
 }

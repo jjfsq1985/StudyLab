@@ -57,11 +57,6 @@
      <string>Time Stamp</string>
     </property>
    </column>
-   <column>
-    <property name="text">
-     <string>Result</string>
-    </property>
-   </column>
   </widget>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">

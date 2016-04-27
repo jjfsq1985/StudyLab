@@ -6,7 +6,8 @@
 
 #include "dlgaddgroup.h"
 #include "dlgadditems.h"
-
+#include <map>
+using namespace  std;
 
 class OPCServerDlg : public QDialog
 {
@@ -18,6 +19,13 @@ public:
 
 public:
     void setOpcCtrl(class OpcCtrl *pCtrl);
+    void EventResponse_DataChange(long NumItems, const  vector<long>& vecClientHandle, const vector<VARIANT>& vecData, const vector<long>& vecQuality, const vector<SYSTEMTIME>& vecStamp);
+
+private:
+    int GetItemIndexInVector(LONG nClientHandle, const vector<ItemInfo>& vecItem);
+
+private:
+    static void CALLBACK ResponseDataChange(void *pSrcCtrl, long NumItems, const  vector<long>& vecClientHandle, const vector<VARIANT>& vecData, const vector<long>& vecQuality, const vector<SYSTEMTIME>& vecStamp);
 
 private:
     virtual void contextMenuEvent(QContextMenuEvent *e);

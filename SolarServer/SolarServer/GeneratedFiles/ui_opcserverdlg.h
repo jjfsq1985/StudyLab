@@ -40,8 +40,8 @@ public:
         OpcGrouptree->setObjectName(QStringLiteral("OpcGrouptree"));
         OpcGrouptree->setGeometry(QRect(9, 40, 271, 351));
         opcitemList = new QTableWidget(DlgOpcServer);
-        if (opcitemList->columnCount() < 5)
-            opcitemList->setColumnCount(5);
+        if (opcitemList->columnCount() < 4)
+            opcitemList->setColumnCount(4);
         QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
         opcitemList->setHorizontalHeaderItem(0, __qtablewidgetitem);
         QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
@@ -50,8 +50,6 @@ public:
         opcitemList->setHorizontalHeaderItem(2, __qtablewidgetitem2);
         QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
         opcitemList->setHorizontalHeaderItem(3, __qtablewidgetitem3);
-        QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
-        opcitemList->setHorizontalHeaderItem(4, __qtablewidgetitem4);
         opcitemList->setObjectName(QStringLiteral("opcitemList"));
         opcitemList->setGeometry(QRect(290, 40, 501, 311));
         buttonBox = new QDialogButtonBox(DlgOpcServer);
@@ -87,8 +85,6 @@ public:
         ___qtablewidgetitem2->setText(QApplication::translate("DlgOpcServer", "Quality", 0));
         QTableWidgetItem *___qtablewidgetitem3 = opcitemList->horizontalHeaderItem(3);
         ___qtablewidgetitem3->setText(QApplication::translate("DlgOpcServer", "Time Stamp", 0));
-        QTableWidgetItem *___qtablewidgetitem4 = opcitemList->horizontalHeaderItem(4);
-        ___qtablewidgetitem4->setText(QApplication::translate("DlgOpcServer", "Result", 0));
         btnconnect->setText(QApplication::translate("DlgOpcServer", "Connect", 0));
         btnDisconnect->setText(QApplication::translate("DlgOpcServer", "Disconnect", 0));
     } // retranslateUi

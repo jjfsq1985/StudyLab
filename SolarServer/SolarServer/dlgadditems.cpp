@@ -70,10 +70,6 @@ void dlgAddItems::on_treeGroups_itemDoubleClicked(QTreeWidgetItem*Item, int colu
         return;
     QString strItemId = Item->data(0, Qt::UserRole).toString();
     wstring cItemID = strItemId.toStdWString();
-    int nRow = ui.tableItems->rowCount();
-    ui.tableItems->setRowCount(nRow + 1);
-    QTableWidgetItem *pTableItem = new QTableWidgetItem(QString::fromStdWString(cItemID));
-    ui.tableItems->setItem(nRow, 0, pTableItem);
     bool bFind = false;
     for (vector<ItemInfo>::iterator it = m_vecItems.begin(); it != m_vecItems.end(); it++)
     {
@@ -85,6 +81,10 @@ void dlgAddItems::on_treeGroups_itemDoubleClicked(QTreeWidgetItem*Item, int colu
     }
     if (!bFind)
     {
+        int nRow = ui.tableItems->rowCount();
+        ui.tableItems->setRowCount(nRow + 1);
+        QTableWidgetItem *pTableItem = new QTableWidgetItem(QString::fromStdWString(cItemID));
+        ui.tableItems->setItem(nRow, 0, pTableItem);
         ItemInfo itemopc = { cItemID, 0 };
         m_vecItems.push_back(itemopc);
     }
@@ -187,11 +187,13 @@ void dlgAddItems::on_BtnAddItems_clicked()
     if (vecAddItems.size() == 1)
     {
         LONG ServerHandle = 0;
+        LONG ClientHandle = 0;
         LONG lResult = 0;
         int nIndex = vecAddItems[0];
-        if (m_pOpcCtrl->AddOpcItem(_bstr_t(m_vecItems[nIndex].strOpcItemId.c_str()), ServerHandle, lResult))
+        if (m_pOpcCtrl->AddOpcItem(_bstr_t(m_vecItems[nIndex].strOpcItemId.c_str()), ServerHandle, ClientHandle, lResult))
         {
             m_vecItems[nIndex].OpcItemSvrHandle = ServerHandle;
+            m_vecItems[nIndex].OpcItemClientHandle = ClientHandle;
             if (SUCCEEDED(lResult))
             {
                 QTableWidgetItem *pTableItem = new QTableWidgetItem("OK");
@@ -214,13 +216,15 @@ void dlgAddItems::on_BtnAddItems_clicked()
             vecAddItemsID.push_back(item);
         }
         vector<LONG> vecSvrHandle;
+        vector<LONG> vecClientHandle;
         vector<LONG> vecResult;
-        if (m_pOpcCtrl->AddOpcItems(vecAddItemsID, vecSvrHandle, vecResult))
+        if (m_pOpcCtrl->AddOpcItems(vecAddItemsID, vecSvrHandle, vecClientHandle, vecResult))
         {
             for (int iAdd = 0; iAdd < vecSvrHandle.size(); iAdd++)
             {
                 int nIndex = vecAddItems[iAdd];
                 m_vecItems[nIndex].OpcItemSvrHandle = vecSvrHandle[iAdd];
+                m_vecItems[nIndex].OpcItemClientHandle = vecClientHandle[iAdd];
                 if (SUCCEEDED(vecResult[iAdd]))
                 {
                     QTableWidgetItem *pTableItem = new QTableWidgetItem("OK");

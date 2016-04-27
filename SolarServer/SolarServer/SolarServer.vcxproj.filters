@@ -83,9 +83,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_browseitemsdlg.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="OPCGroupEventSink.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dlgaddgroup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -124,14 +121,14 @@
     <ClInclude Include="GeneratedFiles\ui_browseitemsdlg.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="OPCGroupEventSink.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_dlgaddgroup.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_dlgadditems.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\OPCAuto.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

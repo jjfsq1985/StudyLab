@@ -21,10 +21,6 @@ public:
     void on_treeGroups_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
 
 private:
-    QString GetDataType(LONG dataType);
-    QString GetDataValue(VARIANT varValue);
-
-private:
     class OpcCtrl *m_pOpcCtrl;
 
 private:

@@ -1,5 +1,6 @@
 #pragma once
 #include <atlbase.h>  //CComPtr
+#include <atlcom.h>
 #include <comdef.h>//_bstr_t
 #include "OPCAuto.h"
 #include <vector>
@@ -13,11 +14,16 @@ typedef struct tagOpcItem
     bool bLeafs;
 }OpcItem;
 
-class OpcCtrl
+typedef void (CALLBACK  *CallbackDataChange)(void *pSrcCtrl, long NumItems, const  vector<long>& vecClientHandle, const vector<VARIANT>& vecData, const vector<long>& vecQuality, const vector<SYSTEMTIME>& vecStamp);
+
+class OpcCtrl : public IDispEventImpl<1, OpcCtrl, &DIID_DIOPCGroupEvent, &LIBID_OPCAutomation,1,0>
 {
 public:
     OpcCtrl();
     ~OpcCtrl();
+    BEGIN_SINK_MAP(OpcCtrl)
+        SINK_ENTRY_EX(1, DIID_DIOPCGroupEvent, 0x1/**\DataChange*/, OnDataChange)
+    END_SINK_MAP()
 
 public:
     bool getListOfServers(_bstr_t sNode, vector<_bstr_t>& serverlist);
@@ -28,14 +34,27 @@ public:
     bool QueryItemProperties(_bstr_t item, LONG& PropCount, vector<LONG>& vecPropID, vector<_bstr_t>& vecPropDesc, vector<LONG>& vecDataType);
     bool GetItemProperties(_bstr_t item, LONG PropCount, vector<LONG> vecPropID, vector<VARIANT>& vecPropValue, vector<LONG>& vecErrors);
 
+    void SetOpcDataChange(void *pSrcCtrl, CallbackDataChange pFunc);
+
 public:
     bool AddGroup(_bstr_t groupName, LONG UpdateRate, bool bSubscribed);
     bool RemoveGroup(_bstr_t groupName);
-    bool AddOpcItems(vector<_bstr_t> vecItemsId,vector<LONG>& vecServerHandle, vector<LONG>& vecResult);
-    bool AddOpcItem(_bstr_t ItemID,LONG& lSvrHandle,LONG& lResult);
+    bool AddOpcItems(vector<_bstr_t> vecItemsId, vector<LONG>& vecServerHandle, vector<LONG>& vecClientHandle, vector<LONG>& vecResult);
+    bool AddOpcItem(_bstr_t ItemID, LONG& lSvrHandle, LONG& lClientHandle, LONG& lResult);
     bool RemoveItems(vector<LONG> vecItemsId);
 
+    QString GetDataType(LONG dataType);
+    QString GetDataValue(VARIANT varValue);
+    QString GetTimeStamp(SYSTEMTIME sysTime);
+
+protected:
+        STDMETHOD(OnDataChange)(long TransactionID, long NumItems, SAFEARRAY  *ClientHandles, SAFEARRAY  *ItemValues, SAFEARRAY  *Qualities, SAFEARRAY  *TimeStamps);
+
 private:
+     
+private:
+    CallbackDataChange m_DataChangeFunc;
+    void *m_pDataChangeCtrl;
     LONG NextHandle();
 private:
     LONG m_nCount;
