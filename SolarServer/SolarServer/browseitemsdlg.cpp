@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "browseitemsdlg.h"
 #include "OpcCtrl.h"
+#include "CommonTranslate.h"
 
 BrowseItemsDlg::BrowseItemsDlg(QWidget *parent)
     : QDialog(parent)
@@ -65,23 +66,23 @@ void BrowseItemsDlg::on_treeGroups_currentItemChanged(QTreeWidgetItem *current, 
     QString strItemId = current->data(0, Qt::UserRole).toString();
     wstring cItemID = strItemId.toStdWString();
     LONG nCount;
-    vector<LONG> vecID;
+    vector<LONG> vecPropID;
     vector<LONG> vecType;
     vector<_bstr_t> vecDesc;
-    m_pOpcCtrl->QueryItemProperties(cItemID.c_str(), nCount, vecID, vecDesc, vecType);
+    m_pOpcCtrl->QueryItemProperties(cItemID.c_str(), nCount, vecPropID, vecDesc, vecType);
     vector<VARIANT> vecValue;
     vector<LONG> vecErr;
-    m_pOpcCtrl->GetItemProperties(cItemID.c_str(), nCount, vecID, vecValue, vecErr);
+    m_pOpcCtrl->GetItemProperties(cItemID.c_str(), nCount, vecPropID, vecValue, vecErr);
     ui.tableItemProp->clearContents();
     ui.tableItemProp->setRowCount(nCount);
     for (int i = 0; i < nCount; i++)
     {
-        QString strId = QString("%1").arg(vecID[i]);
+        QString strId = QString("%1").arg(vecPropID[i]);
         ui.tableItemProp->setItem(i, 0, new QTableWidgetItem(strId));
         wstring strDesc = vecDesc[i].GetBSTR();
         ui.tableItemProp->setItem( i, 1, new QTableWidgetItem(QString::fromStdWString(strDesc)) );
-        ui.tableItemProp->setItem(i, 2, new QTableWidgetItem(m_pOpcCtrl->GetDataType(vecType[i])));
-        ui.tableItemProp->setItem(i, 3, new QTableWidgetItem(m_pOpcCtrl->GetDataValue(vecValue[i])));
+        ui.tableItemProp->setItem(i, 2, new QTableWidgetItem(CommonTranslate::GetDataType(vecType[i])));
+        ui.tableItemProp->setItem(i, 3, new QTableWidgetItem(CommonTranslate::GetDataValue(vecValue[i])));
         ui.tableItemProp->setItem(i, 4, new QTableWidgetItem(QString::fromStdWString(cItemID)));
     }
 }

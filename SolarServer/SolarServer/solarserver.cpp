@@ -23,6 +23,8 @@ SolarServer::~SolarServer()
 void SolarServer::InitServer()
 {
     m_pOpc = new OpcCtrl();
+
+    //³õÊ¼»¯ÍøÂç
 }
 
 void SolarServer::on_actionOPC_Server_triggered()

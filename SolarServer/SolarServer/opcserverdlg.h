@@ -40,6 +40,7 @@ private:
     void RemoveItem();
 
 private:
+    wstring m_strSelectedGroup;
     map<wstring, vector<ItemInfo> > m_mapItems;
      vector<GroupParam> m_vecGroups;
     class OpcCtrl *m_pOpcCtrl;

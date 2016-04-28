@@ -101,6 +101,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_dlgadditems.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="CommonTranslate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -128,6 +131,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\OPCAuto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonTranslate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

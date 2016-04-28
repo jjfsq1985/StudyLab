@@ -196,12 +196,12 @@ void dlgAddItems::on_BtnAddItems_clicked()
             m_vecItems[nIndex].OpcItemClientHandle = ClientHandle;
             if (SUCCEEDED(lResult))
             {
-                QTableWidgetItem *pTableItem = new QTableWidgetItem("OK");
+                QTableWidgetItem *pTableItem = new QTableWidgetItem(QString("0x%1").arg(lResult, 2, 16,QChar('0')));
                 ui.tableItems->setItem(nIndex, 1, pTableItem);
             }
             else
             {
-                QTableWidgetItem *pTableItem = new QTableWidgetItem(QString("0x%1").arg(lResult, 0, 16));
+                QTableWidgetItem *pTableItem = new QTableWidgetItem(QString("0x%1").arg(lResult, 2, 16, QChar('0')));
                 ui.tableItems->setItem(nIndex, 1, pTableItem);
             }
         }
@@ -227,12 +227,12 @@ void dlgAddItems::on_BtnAddItems_clicked()
                 m_vecItems[nIndex].OpcItemClientHandle = vecClientHandle[iAdd];
                 if (SUCCEEDED(vecResult[iAdd]))
                 {
-                    QTableWidgetItem *pTableItem = new QTableWidgetItem("OK");
+                    QTableWidgetItem *pTableItem = new QTableWidgetItem(QString("0x%1").arg(vecResult[iAdd], 2, 16, QChar('0')));
                     ui.tableItems->setItem(nIndex, 1, pTableItem);
                 }
                 else
                 {
-                    QTableWidgetItem *pTableItem = new QTableWidgetItem(QString("0x%1").arg(vecResult[iAdd], 0, 16));
+                    QTableWidgetItem *pTableItem = new QTableWidgetItem(QString("0x%1").arg(vecResult[iAdd], 2, 16, QChar('0')));
                     ui.tableItems->setItem(nIndex, 1, pTableItem);
                 }
             }

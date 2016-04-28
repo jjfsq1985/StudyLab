@@ -83,6 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="browseitemsdlg.cpp" />
+    <ClCompile Include="CommonTranslate.cpp" />
     <ClCompile Include="dlgaddgroup.cpp" />
     <ClCompile Include="dlgadditems.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_browseitemsdlg.cpp">
@@ -169,6 +170,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../../dlgadditems.h"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I.\GeneratedFiles" "-I.\..\include" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
     </CustomBuild>
     <ClInclude Include="..\include\OPCAuto.h" />
+    <ClInclude Include="CommonTranslate.h" />
     <ClInclude Include="GeneratedFiles\ui_browseitemsdlg.h" />
     <ClInclude Include="GeneratedFiles\ui_dlgaddgroup.h" />
     <ClInclude Include="GeneratedFiles\ui_dlgadditems.h" />

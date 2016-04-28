@@ -43,22 +43,17 @@ public:
     bool AddOpcItem(_bstr_t ItemID, LONG& lSvrHandle, LONG& lClientHandle, LONG& lResult);
     bool RemoveItems(vector<LONG> vecItemsId);
 
-    QString GetDataType(LONG dataType);
-    QString GetDataValue(VARIANT varValue);
-    QString GetTimeStamp(SYSTEMTIME sysTime);
-
 protected:
         STDMETHOD(OnDataChange)(long TransactionID, long NumItems, SAFEARRAY  *ClientHandles, SAFEARRAY  *ItemValues, SAFEARRAY  *Qualities, SAFEARRAY  *TimeStamps);
 
-private:
-     
 private:
     CallbackDataChange m_DataChangeFunc;
     void *m_pDataChangeCtrl;
     LONG NextHandle();
 private:
-    LONG m_nCount;
+    LONG m_nCount;   //ClientHander累计器
     IUnknown *m_pUnk;
-    ATL::CComPtr<IOPCGroup> m_ActiveOPCGroup;
+    int m_nActiveIndex;   //当前活动的Group索引
+    vector<ATL::CComPtr<IOPCGroup> > m_vecActiveOPCGroup;
 };
 

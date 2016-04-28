@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>809</width>
+    <width>848</width>
     <height>396</height>
    </rect>
   </property>
@@ -33,7 +33,7 @@
     <rect>
      <x>290</x>
      <y>40</y>
-     <width>501</width>
+     <width>551</width>
      <height>311</height>
     </rect>
    </property>
@@ -57,11 +57,16 @@
      <string>Time Stamp</string>
     </property>
    </column>
+   <column>
+    <property name="text">
+     <string>Result</string>
+    </property>
+   </column>
   </widget>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>570</x>
+     <x>680</x>
      <y>360</y>
      <width>156</width>
      <height>23</height>
