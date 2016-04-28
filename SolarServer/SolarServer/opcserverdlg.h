@@ -34,6 +34,8 @@ private:
 
 private slots:
     void on_OpcGrouptree_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+    void on_opcitemList_itemChanged(QTableWidgetItem *item);
+    void on_btnEdit_clicked();
     void on_btnconnect_clicked();
     void on_btnDisconnect_clicked();
     void AddGroup();
@@ -49,6 +51,7 @@ private:
      vector<GroupParam> m_vecGroups;
     class OpcCtrl *m_pOpcCtrl;
 private:
+    bool m_bEdit;
     QMenu *m_pContextMenu;
     QAction *m_pAddGroup;
     QAction *m_pBrowserItems;

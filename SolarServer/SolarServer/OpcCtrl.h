@@ -42,6 +42,8 @@ public:
     bool AddOpcItems(vector<_bstr_t> vecItemsId, vector<LONG>& vecServerHandle, vector<LONG>& vecClientHandle, vector<LONG>& vecResult);
     bool AddOpcItem(_bstr_t ItemID, LONG& lSvrHandle, LONG& lClientHandle, LONG& lResult);
     bool RemoveItems(vector<LONG> vecItemsId);
+    bool SyncRead(LONG nItems, const vector<LONG>& vecSvrHander, vector<VARIANT>& vecValue, vector<LONG>& vecErrors, vector<LONG>& vecQualities, vector<SYSTEMTIME>& vecTimeStamps);
+    bool SyncWrite(LONG nItems, const vector<LONG>& vecSvrHander, const vector<VARIANT>& vecValue, vector<LONG>& vecErrors);
 
 protected:
         STDMETHOD(OnDataChange)(long TransactionID, long NumItems, SAFEARRAY  *ClientHandles, SAFEARRAY  *ItemValues, SAFEARRAY  *Qualities, SAFEARRAY  *TimeStamps);

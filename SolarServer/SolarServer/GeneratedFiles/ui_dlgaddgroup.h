@@ -17,36 +17,30 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpinBox>
-#include <QtWidgets/QTextEdit>
 
 QT_BEGIN_NAMESPACE
 
 class Ui_DlgAddGroup
 {
 public:
-    QLabel *label;
-    QTextEdit *groupName;
+    QLabel *label_1;
     QCheckBox *Actived;
     QLabel *label_2;
     QSpinBox *updateRate;
     QPushButton *btnOk;
+    QLineEdit *groupName;
 
     void setupUi(QDialog *DlgAddGroup)
     {
         if (DlgAddGroup->objectName().isEmpty())
             DlgAddGroup->setObjectName(QStringLiteral("DlgAddGroup"));
-        DlgAddGroup->resize(396, 171);
-        label = new QLabel(DlgAddGroup);
-        label->setObjectName(QStringLiteral("label"));
-        label->setGeometry(QRect(50, 20, 61, 16));
-        groupName = new QTextEdit(DlgAddGroup);
-        groupName->setObjectName(QStringLiteral("groupName"));
-        groupName->setGeometry(QRect(120, 20, 191, 21));
-        groupName->setInputMethodHints(Qt::ImhNone);
-        groupName->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        groupName->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        DlgAddGroup->resize(315, 178);
+        label_1 = new QLabel(DlgAddGroup);
+        label_1->setObjectName(QStringLiteral("label_1"));
+        label_1->setGeometry(QRect(50, 20, 61, 16));
         Actived = new QCheckBox(DlgAddGroup);
         Actived->setObjectName(QStringLiteral("Actived"));
         Actived->setGeometry(QRect(110, 60, 71, 16));
@@ -63,6 +57,12 @@ public:
         btnOk = new QPushButton(DlgAddGroup);
         btnOk->setObjectName(QStringLiteral("btnOk"));
         btnOk->setGeometry(QRect(140, 130, 75, 23));
+        groupName = new QLineEdit(DlgAddGroup);
+        groupName->setObjectName(QStringLiteral("groupName"));
+        groupName->setGeometry(QRect(120, 20, 171, 20));
+        QWidget::setTabOrder(groupName, Actived);
+        QWidget::setTabOrder(Actived, updateRate);
+        QWidget::setTabOrder(updateRate, btnOk);
 
         retranslateUi(DlgAddGroup);
         QObject::connect(btnOk, SIGNAL(clicked()), DlgAddGroup, SLOT(accept()));
@@ -73,7 +73,7 @@ public:
     void retranslateUi(QDialog *DlgAddGroup)
     {
         DlgAddGroup->setWindowTitle(QApplication::translate("DlgAddGroup", "DlgAddGroup", 0));
-        label->setText(QApplication::translate("DlgAddGroup", "Group Name", 0));
+        label_1->setText(QApplication::translate("DlgAddGroup", "Group Name", 0));
         Actived->setText(QApplication::translate("DlgAddGroup", "Actived", 0));
         label_2->setText(QApplication::translate("DlgAddGroup", "Update Rate", 0));
         btnOk->setText(QApplication::translate("DlgAddGroup", "OK", 0));

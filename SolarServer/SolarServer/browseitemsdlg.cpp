@@ -54,7 +54,7 @@ void BrowseItemsDlg::on_treeGroups_itemExpanded(QTreeWidgetItem*Item)
         wstring strItem = (*it).sItem.GetBSTR();
         wstring strData = (*it).sItemId.GetBSTR();
         childItem->setText(0, QString::fromStdWString(strItem));
-        childItem->setData( 0, Qt::UserRole, QVariant(QString::fromStdWString(strData)) );
+        childItem->setData( 0, Qt::UserRole, QVariant(QString::fromStdWString(strData)) );//item节点的itemID
         Item->addChild(childItem);
     }
 }
@@ -63,7 +63,7 @@ void BrowseItemsDlg::on_treeGroups_currentItemChanged(QTreeWidgetItem *current, 
 {
     if (current->childCount() > 0 || current->parent() == NULL)
         return;
-    QString strItemId = current->data(0, Qt::UserRole).toString();
+    QString strItemId = current->data(0, Qt::UserRole).toString();//item节点的itemID
     wstring cItemID = strItemId.toStdWString();
     LONG nCount;
     vector<LONG> vecPropID;

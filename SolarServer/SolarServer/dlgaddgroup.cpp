@@ -21,7 +21,7 @@ void DlgAddGroup::SetAddedGroup(const vector<GroupParam>& vecAddedGroup)
 
 void DlgAddGroup::accept()
 {
-    wstring strText = ui.groupName->toPlainText().toStdWString();
+    wstring strText = ui.groupName->text().toStdWString();
     bool bRet = true;
     for (vector<GroupParam>::iterator it = m_vecGroups.begin(); it != m_vecGroups.end(); it++)
     {

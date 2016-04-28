@@ -59,7 +59,7 @@ void dlgAddItems::on_treeGroups_itemExpanded(QTreeWidgetItem*Item)
         wstring strItem = (*it).sItem.GetBSTR();
         wstring strData = (*it).sItemId.GetBSTR();
         childItem->setText(0, QString::fromStdWString(strItem));
-        childItem->setData(0, Qt::UserRole, QVariant(QString::fromStdWString(strData)));
+        childItem->setData(0, Qt::UserRole, QVariant(QString::fromStdWString(strData)));//item节点的itemID
         Item->addChild(childItem);
     }
 }
@@ -68,7 +68,7 @@ void dlgAddItems::on_treeGroups_itemDoubleClicked(QTreeWidgetItem*Item, int colu
 {
     if (Item->childCount() > 0 || Item->parent() == NULL)
         return;
-    QString strItemId = Item->data(0, Qt::UserRole).toString();
+    QString strItemId = Item->data(0, Qt::UserRole).toString();//item节点的itemID
     wstring cItemID = strItemId.toStdWString();
     bool bFind = false;
     for (vector<ItemInfo>::iterator it = m_vecItems.begin(); it != m_vecItems.end(); it++)
@@ -215,15 +215,15 @@ void dlgAddItems::on_BtnAddItems_clicked()
             _bstr_t item(strItemId.c_str());
             vecAddItemsID.push_back(item);
         }
-        vector<LONG> vecSvrHandle;
+        vector<LONG> vecSvrHandler;
         vector<LONG> vecClientHandle;
         vector<LONG> vecResult;
-        if (m_pOpcCtrl->AddOpcItems(vecAddItemsID, vecSvrHandle, vecClientHandle, vecResult))
+        if (m_pOpcCtrl->AddOpcItems(vecAddItemsID, vecSvrHandler, vecClientHandle, vecResult))
         {
-            for (int iAdd = 0; iAdd < vecSvrHandle.size(); iAdd++)
+            for (int iAdd = 0; iAdd < vecSvrHandler.size(); iAdd++)
             {
                 int nIndex = vecAddItems[iAdd];
-                m_vecItems[nIndex].OpcItemSvrHandle = vecSvrHandle[iAdd];
+                m_vecItems[nIndex].OpcItemSvrHandle = vecSvrHandler[iAdd];
                 m_vecItems[nIndex].OpcItemClientHandle = vecClientHandle[iAdd];
                 if (SUCCEEDED(vecResult[iAdd]))
                 {

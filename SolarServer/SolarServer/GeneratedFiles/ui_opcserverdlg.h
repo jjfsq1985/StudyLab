@@ -30,6 +30,7 @@ public:
     QDialogButtonBox *buttonBox;
     QPushButton *btnconnect;
     QPushButton *btnDisconnect;
+    QPushButton *btnEdit;
 
     void setupUi(QDialog *DlgOpcServer)
     {
@@ -66,6 +67,9 @@ public:
         btnDisconnect = new QPushButton(DlgOpcServer);
         btnDisconnect->setObjectName(QStringLiteral("btnDisconnect"));
         btnDisconnect->setGeometry(QRect(130, 10, 75, 23));
+        btnEdit = new QPushButton(DlgOpcServer);
+        btnEdit->setObjectName(QStringLiteral("btnEdit"));
+        btnEdit->setGeometry(QRect(410, 360, 75, 23));
 
         retranslateUi(DlgOpcServer);
         QObject::connect(buttonBox, SIGNAL(accepted()), DlgOpcServer, SLOT(accept()));
@@ -91,6 +95,7 @@ public:
         ___qtablewidgetitem4->setText(QApplication::translate("DlgOpcServer", "Result", 0));
         btnconnect->setText(QApplication::translate("DlgOpcServer", "Connect", 0));
         btnDisconnect->setText(QApplication::translate("DlgOpcServer", "Disconnect", 0));
+        btnEdit->setText(QApplication::translate("DlgOpcServer", "\347\274\226\350\276\221", 0));
     } // retranslateUi
 
 };
