@@ -18,10 +18,6 @@ OpcCtrl::OpcCtrl()
 
 OpcCtrl::~OpcCtrl()
 {
-    if (m_vecActiveOPCGroup.size() > 0)
-    {
-        DispEventUnadvise(m_vecActiveOPCGroup[m_nActiveIndex]);//取消订阅事件
-    }
     DisconnectServer();
     m_pUnk->Release();
     CoUninitialize();

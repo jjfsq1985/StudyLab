@@ -19,6 +19,8 @@ public:
 
 public:
     void setOpcCtrl(class OpcCtrl *pCtrl);
+    void InitOpcServer(const wstring& strSvrName, const  vector<GroupParam>& vecGroups, const map<wstring, vector<ItemInfo> >& mapItems);
+    void GetOpcData(wstring& strSvrName, vector<GroupParam>& vecGroups, map<wstring, vector<ItemInfo> >& mapItems);
     void EventResponse_DataChange(long NumItems, const  vector<long>& vecClientHandle, const vector<VARIANT>& vecData, const vector<long>& vecQuality, const vector<SYSTEMTIME>& vecStamp);
 
 private:
@@ -30,7 +32,8 @@ private:
 private:
     virtual void contextMenuEvent(QContextMenuEvent *e);
 
-    private slots:
+private slots:
+    void on_OpcGrouptree_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
     void on_btnconnect_clicked();
     void on_btnDisconnect_clicked();
     void AddGroup();
@@ -40,6 +43,7 @@ private:
     void RemoveItem();
 
 private:
+    wstring m_strServerName;
     wstring m_strSelectedGroup;
     map<wstring, vector<ItemInfo> > m_mapItems;
      vector<GroupParam> m_vecGroups;

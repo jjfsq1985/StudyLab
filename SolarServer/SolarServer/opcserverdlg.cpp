@@ -32,15 +32,101 @@ OPCServerDlg::OPCServerDlg(QWidget *parent)
     connect(m_pAddItems, &QAction::triggered, this, &OPCServerDlg::AddItems);
     connect(m_pRemoveItem, &QAction::triggered, this, &OPCServerDlg::RemoveItem);
 
+    m_strServerName = L"";
     m_strSelectedGroup = L"";
     ui.opcitemList->horizontalHeader()->resizeSection(3, 150);
-
-
 }
 
 OPCServerDlg::~OPCServerDlg()
 {
+    m_pOpcCtrl->SetOpcDataChange(NULL, NULL);
+    m_vecGroups.clear();
     m_mapItems.clear();
+}
+
+void OPCServerDlg::InitOpcServer(const wstring& strSvrName, const  vector<GroupParam>& vecGroups, const map<wstring, vector<ItemInfo> >& mapItems)
+{
+    m_strServerName = strSvrName;
+    m_vecGroups = vecGroups;
+    m_mapItems = mapItems;
+    QTreeWidgetItem *rootItem = NULL;
+    if (m_strServerName != L"")
+    {
+        rootItem = new QTreeWidgetItem(ui.OpcGrouptree);
+        rootItem->setText(0, QString::fromStdWString(m_strServerName));
+        ui.OpcGrouptree->addTopLevelItem(rootItem);
+    }
+
+    if (m_vecGroups.size() > 0 && rootItem != NULL)
+    {
+        m_strSelectedGroup = m_vecGroups[0].strGroupName;
+        for (vector<GroupParam>::iterator it = m_vecGroups.begin(); it != m_vecGroups.end(); it++)
+        {
+            wstring strGroup = (*it).strGroupName;
+            QTreeWidgetItem *pGroup = new QTreeWidgetItem(rootItem);
+            pGroup->setText(0, QString::fromStdWString(strGroup));
+            rootItem->addChild(pGroup);
+            
+            if (m_mapItems.size() > 0)
+            {
+                map<wstring, vector<ItemInfo> >::iterator itfind = m_mapItems.find(strGroup);
+                if (itfind != m_mapItems.end())
+                {
+                    vector<ItemInfo>& vecItems = itfind->second;
+                    for (vector<ItemInfo>::iterator it = vecItems.begin(); it != vecItems.end(); it++)
+                    {
+                        QTreeWidgetItem *child = new QTreeWidgetItem(pGroup);
+                        child->setText(0, QString::fromStdWString((*it).strOpcItemId));
+                        child->setData(0, Qt::UserRole, QVariant((*it).OpcItemSvrHandle));
+                        pGroup->addChild(child);
+                    }
+                    if (m_strSelectedGroup == strGroup && !pGroup->isExpanded())
+                        ui.OpcGrouptree->expandItem(pGroup);
+                }
+            }
+        }
+        if (!rootItem->isExpanded())
+            ui.OpcGrouptree->expandItem(rootItem);
+    }
+    if (m_mapItems.size() > 0)
+    {
+        map<wstring, vector<ItemInfo> >::iterator itfind = m_mapItems.find(m_strSelectedGroup);
+        if (itfind != m_mapItems.end())
+        {
+            vector<ItemInfo>& vecItems = itfind->second;
+            ui.opcitemList->setRowCount(vecItems.size());
+            int nRow = 0;
+            QTableWidgetItem *pTableItem = NULL;
+            for (vector<ItemInfo>::iterator it = vecItems.begin(); it != vecItems.end(); it++)
+            {
+                wstring strId = (*it).strOpcItemId;
+                pTableItem = new QTableWidgetItem(QString::fromStdWString(strId));
+                ui.opcitemList->setItem(nRow, 0, pTableItem);
+                LONG nCount = 0;
+                vector<LONG> vecPropID;
+                vector<LONG> vecType;
+                vector<_bstr_t> vecDesc;
+                m_pOpcCtrl->QueryItemProperties(strId.c_str(), nCount, vecPropID, vecDesc, vecType);
+                vector<VARIANT> vecValue;
+                vector<LONG> vecErr;
+                m_pOpcCtrl->GetItemProperties(strId.c_str(), nCount, vecPropID, vecValue, vecErr);
+                if (nCount >= 4)
+                {
+                    pTableItem = new QTableWidgetItem(CommonTranslate::GetDataValue(vecValue[1]));
+                    ui.opcitemList->setItem(nRow, 1, pTableItem);
+                    pTableItem = new QTableWidgetItem(CommonTranslate::GetDataValue(vecValue[2]));
+                    ui.opcitemList->setItem(nRow, 2, pTableItem);
+                    pTableItem = new QTableWidgetItem(CommonTranslate::GetDataValue(vecValue[3]));
+                    ui.opcitemList->setItem(nRow, 3, pTableItem);
+                    pTableItem = new QTableWidgetItem(QString("0x%1").arg(vecErr[1], 0, 16, QChar('0')));
+                    ui.opcitemList->setItem(nRow, 4, pTableItem);
+                }
+                nRow++;
+            }
+        }
+    }
+
+    m_pOpcCtrl->SetOpcDataChange(this, &OPCServerDlg::ResponseDataChange);
 }
 
 void OPCServerDlg::setOpcCtrl(class OpcCtrl *pCtrl)
@@ -59,6 +145,7 @@ void OPCServerDlg::on_btnconnect_clicked()
         bool bRet = m_pOpcCtrl->connectServer(strName.c_str(), "localhost");
         if (bRet)
         {
+            m_strServerName = strName;
             QTreeWidgetItem *rootItem = new QTreeWidgetItem(ui.OpcGrouptree);
             rootItem->setText(0, QString::fromStdWString(strName));
             ui.OpcGrouptree->addTopLevelItem(rootItem);
@@ -69,6 +156,9 @@ void OPCServerDlg::on_btnconnect_clicked()
 void OPCServerDlg::on_btnDisconnect_clicked()
 {
     m_pOpcCtrl->DisconnectServer();
+    m_strServerName = L"";
+    m_vecGroups.clear();
+    m_mapItems.clear();
 }
 
 void OPCServerDlg::contextMenuEvent(QContextMenuEvent *e)
@@ -104,7 +194,7 @@ void OPCServerDlg::AddGroup()
 {
     DlgAddGroup addgropdlg(this);
     addgropdlg.SetAddedGroup(m_vecGroups);
-    if (addgropdlg.exec() == Accepted)
+    if (addgropdlg.exec() == QDialog::Accepted)
     {
         wstring strGroup = L"Default";
         bool bActived = true;
@@ -116,8 +206,7 @@ void OPCServerDlg::AddGroup()
         par.nUpdateRate = nUpdateRate;
         m_vecGroups.push_back(par);
         m_pOpcCtrl->AddGroup(strGroup.c_str(), nUpdateRate, bActived);
-        if (bActived)
-            m_strSelectedGroup = strGroup;//记录当前活动的Groups
+        m_strSelectedGroup = strGroup;//记录当前活动的Groups
         QTreeWidgetItem *pTopItem = ui.OpcGrouptree->topLevelItem(0);
         QTreeWidgetItem *child = new QTreeWidgetItem(pTopItem);
         child->setText(0, QString::fromStdWString(strGroup));
@@ -167,7 +256,7 @@ void OPCServerDlg::AddItems()
     dlgAddItems addItemsdlg(this);
     addItemsdlg.setOpcCtrl(m_pOpcCtrl);
     addItemsdlg.browseItems();
-    if (addItemsdlg.exec() == Accepted)
+    if (addItemsdlg.exec() == QDialog::Accepted)
     {
         vector<ItemInfo> vecAddItems;
         addItemsdlg.GetSelectedItems(vecAddItems);
@@ -269,7 +358,54 @@ int OPCServerDlg::GetItemIndexInVector(LONG nClientHandle, const vector<ItemInfo
         nIndex++;
     }
     return nRow;
+}
 
+void OPCServerDlg::on_OpcGrouptree_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
+{
+    if (current->parent() == NULL)
+        return;
+    wstring strGroup = L"";
+    if (current->childCount() == 0)
+        strGroup = current->parent()->text(0).toStdWString();
+    else
+        strGroup = current->text(0).toStdWString();
+    if (m_mapItems.size() <= 0 || strGroup == m_strSelectedGroup)
+        return;
+    m_strSelectedGroup = strGroup;
+    map<wstring, vector<ItemInfo> >::iterator itfind = m_mapItems.find(m_strSelectedGroup);
+    if (itfind != m_mapItems.end())
+    {
+        vector<ItemInfo>& vecItems = itfind->second;
+        ui.opcitemList->setRowCount(vecItems.size());
+        int nRow = 0;
+        QTableWidgetItem *pTableItem = NULL;
+        for (vector<ItemInfo>::iterator it = vecItems.begin(); it != vecItems.end(); it++)
+        {
+            wstring strId = (*it).strOpcItemId;
+            pTableItem = new QTableWidgetItem(QString::fromStdWString(strId));
+            ui.opcitemList->setItem(nRow, 0, pTableItem);
+            LONG nCount = 0;
+            vector<LONG> vecPropID;
+            vector<LONG> vecType;
+            vector<_bstr_t> vecDesc;
+            m_pOpcCtrl->QueryItemProperties(strId.c_str(), nCount, vecPropID, vecDesc, vecType);
+            vector<VARIANT> vecValue;
+            vector<LONG> vecErr;
+            m_pOpcCtrl->GetItemProperties(strId.c_str(), nCount, vecPropID, vecValue, vecErr);
+            if (nCount >= 4)
+            {
+                pTableItem = new QTableWidgetItem(CommonTranslate::GetDataValue(vecValue[1]));
+                ui.opcitemList->setItem(nRow, 1, pTableItem);
+                pTableItem = new QTableWidgetItem(CommonTranslate::GetDataValue(vecValue[2]));
+                ui.opcitemList->setItem(nRow, 2, pTableItem);
+                pTableItem = new QTableWidgetItem(CommonTranslate::GetDataValue(vecValue[3]));
+                ui.opcitemList->setItem(nRow, 3, pTableItem);
+                pTableItem = new QTableWidgetItem(QString("0x%1").arg(vecErr[1], 0, 16, QChar('0')));
+                ui.opcitemList->setItem(nRow, 4, pTableItem);
+            }
+            nRow++;
+        }
+    }
 }
 
 void OPCServerDlg::EventResponse_DataChange(long NumItems, const  vector<long>& vecClientHandle, const vector<VARIANT>& vecData, const vector<long>& vecQuality, const vector<SYSTEMTIME>& vecStamp)
@@ -294,4 +430,11 @@ void OPCServerDlg::EventResponse_DataChange(long NumItems, const  vector<long>& 
             ui.opcitemList->setItem(nRow, 3, pTableItem);
         }
     }
+}
+
+void OPCServerDlg::GetOpcData(wstring& strSvrName, vector<GroupParam>& vecGroups, map<wstring, vector<ItemInfo> >& mapItems)
+{
+    strSvrName = m_strServerName;
+    vecGroups = m_vecGroups;
+    mapItems = m_mapItems;
 }

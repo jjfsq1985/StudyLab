@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_solarserver.h"
+#include "opcserverdlg.h"
 
 class SolarServer : public QMainWindow
 {
@@ -22,6 +23,9 @@ private:
     Ui::SolarServerClass ui;
 
 private:
+    wstring m_strSvrName;
+    map<wstring, vector<ItemInfo> > m_mapItems;
+    vector<GroupParam> m_vecGroups;
     class OpcCtrl *m_pOpc;
 };
 

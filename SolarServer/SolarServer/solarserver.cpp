@@ -2,7 +2,6 @@
 #include "solarserver.h"
 
 #include "OpcCtrl.h"
-#include "opcserverdlg.h"
 #include "opclistdlg.h"
 
 SolarServer::SolarServer(QWidget *parent)
@@ -31,5 +30,9 @@ void SolarServer::on_actionOPC_Server_triggered()
 {
     OPCServerDlg dlg(this);
     dlg.setOpcCtrl(m_pOpc);
-    dlg.exec();
+    dlg.InitOpcServer(m_strSvrName, m_vecGroups, m_mapItems);
+    if (dlg.exec() == QDialog::Accepted)
+    {
+      dlg.GetOpcData(m_strSvrName, m_vecGroups, m_mapItems);
+    }
 }
