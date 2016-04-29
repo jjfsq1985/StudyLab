@@ -12,6 +12,7 @@ typedef struct _tagItemInfo
     wstring strOpcItemId;
     LONG OpcItemSvrHandle;
     LONG OpcItemClientHandle;
+    LONG AccessRight;
 }ItemInfo;
 
 class dlgAddItems : public QDialog

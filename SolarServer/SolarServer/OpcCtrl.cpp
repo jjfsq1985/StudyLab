@@ -226,7 +226,7 @@ bool OpcCtrl::QueryItemProperties(_bstr_t item, LONG& PropCount, vector<LONG>& v
     return true;
 }
 
-bool OpcCtrl::GetItemProperties(_bstr_t item, LONG PropCount, vector<LONG> vecPropID, vector<VARIANT>& vecPropValue, vector<LONG>& vecErrors)
+bool OpcCtrl::GetItemProperties(_bstr_t item, LONG PropCount, vector<LONG> vecPropID, vector<VARIANT>& vecPropValue, vector<INT>& vecErrors)
 {
     ATL::CComPtr<IOPCAutoServer> iServer;
     HRESULT hr = m_pUnk->QueryInterface(IID_IOPCAutoServer, (void**)&iServer);
@@ -250,7 +250,7 @@ bool OpcCtrl::GetItemProperties(_bstr_t item, LONG PropCount, vector<LONG> vecPr
         VARIANT varValue;
         SafeArrayGetElement(pPropValue, (LONG*)&i, (void *)&varValue);
         vecPropValue.push_back(varValue);
-        LONG lErr = 0;
+        INT lErr = 0;
         SafeArrayGetElement(pPropErr, (LONG*)&i, (void *)&lErr);
         vecErrors.push_back(lErr);
     }
@@ -338,7 +338,7 @@ bool OpcCtrl::RemoveGroup(_bstr_t groupName)
     return true;
 }
 
-bool OpcCtrl::AddOpcItems(vector<_bstr_t> vecItemsId, vector<LONG>& vecServerHandle, vector<LONG>& vecClientHandle, vector<LONG>& vecResult)
+bool OpcCtrl::AddOpcItems(vector<_bstr_t> vecItemsId, vector<LONG>& vecServerHandle, vector<LONG>& vecClientHandle, vector<LONG>& vecAccessRight, vector<INT>& vecResult)
 {
     if (m_vecActiveOPCGroup.size() <= m_nActiveIndex || vecItemsId.size() < 2)
         return false;
@@ -368,13 +368,18 @@ bool OpcCtrl::AddOpcItems(vector<_bstr_t> vecItemsId, vector<LONG>& vecServerHan
     //¼ÇÂ¼pServerHandle
     for (i = 1; i <= nAddCount; i++)
     {
-        LONG serverHandle;
+        LONG serverHandle = 0;
         SafeArrayGetElement(pServerHandles, (LONG*)&i, (void *)&serverHandle);
         vecServerHandle.push_back(serverHandle);
-        LONG clientHandle;
+        ATL::CComPtr<OPCItem> iSingleItemOpc;
+        iOpcItems->GetOPCItem(serverHandle, &iSingleItemOpc);
+        LONG clientHandle = 0;
         SafeArrayGetElement(pClientHandle, (LONG*)&i, (void *)&clientHandle);
         vecClientHandle.push_back(clientHandle);
-        LONG result;
+        LONG AccessRight = 0;
+        iSingleItemOpc->get_AccessRights(&AccessRight);
+        vecAccessRight.push_back(AccessRight);
+        INT result = 0;
         SafeArrayGetElement(pErrs, (LONG*)&i, (void *)&result);
         vecResult.push_back(result);
     }
@@ -390,7 +395,7 @@ bool OpcCtrl::AddOpcItems(vector<_bstr_t> vecItemsId, vector<LONG>& vecServerHan
     return true;
 }
 
-bool OpcCtrl::AddOpcItem(_bstr_t ItemID, LONG& lSvrHandle, LONG& lClientHandle, LONG& lResult)
+bool OpcCtrl::AddOpcItem(_bstr_t ItemID, LONG& lSvrHandle, LONG& lClientHandle, LONG& lAccessRight, INT& lResult)
 {
     if (m_vecActiveOPCGroup.size() <= m_nActiveIndex)
         return false;
@@ -402,7 +407,10 @@ bool OpcCtrl::AddOpcItem(_bstr_t ItemID, LONG& lSvrHandle, LONG& lClientHandle, 
     lClientHandle = NextHandle();
     lResult = iOpcItems->AddItem(ItemID.GetBSTR(), lClientHandle, (OPCItem**)&iItemOpc);
     if (SUCCEEDED(lResult))
+    {
         iItemOpc->get_ServerHandle(&lSvrHandle);
+        iItemOpc->get_AccessRights(&lAccessRight);
+    }
     return true;
 }
 
@@ -469,7 +477,7 @@ STDMETHODIMP OpcCtrl::OnDataChange(long TransactionID, long NumItems, SAFEARRAY 
     return S_OK;
 }
 
-bool OpcCtrl::SyncRead(LONG nItems, const vector<LONG>& vecSvrHander, vector<VARIANT>& vecValue, vector<LONG>& vecErrors, vector<LONG>& vecQualities, vector<SYSTEMTIME>& vecTimeStamps)
+bool OpcCtrl::SyncRead(LONG nItems, const vector<LONG>& vecSvrHander, vector<VARIANT>& vecValue, vector<INT>& vecErrors, vector<LONG>& vecQualities, vector<SYSTEMTIME>& vecTimeStamps)
 {
     if (m_vecActiveOPCGroup.size() <= m_nActiveIndex)
         return false;    
@@ -493,7 +501,7 @@ bool OpcCtrl::SyncRead(LONG nItems, const vector<LONG>& vecSvrHander, vector<VAR
         VARIANT itemVal;
         SafeArrayGetElement(pValue, &i, (void*)&itemVal);
         vecValue.push_back(itemVal);
-        LONG result;
+        INT result;
         SafeArrayGetElement(pErrs, (LONG*)&i, (void *)&result);
         vecErrors.push_back(result);
         if (Quality.vt == (VT_ARRAY | VT_I2))
@@ -520,7 +528,7 @@ bool OpcCtrl::SyncRead(LONG nItems, const vector<LONG>& vecSvrHander, vector<VAR
     return true;
 }
 
-bool OpcCtrl::SyncWrite(LONG nItems, const vector<LONG>& vecSvrHander, const vector<VARIANT>& vecValue, vector<LONG>& vecErrors)
+bool OpcCtrl::SyncWrite(LONG nItems, const vector<LONG>& vecSvrHander, const vector<VARIANT>& vecValue, vector<INT>& vecErrors)
 {
     if (m_vecActiveOPCGroup.size() <= m_nActiveIndex)
         return false;
@@ -543,7 +551,7 @@ bool OpcCtrl::SyncWrite(LONG nItems, const vector<LONG>& vecSvrHander, const vec
 
     for (i = 1; i <= nItems; i++)
     {
-        LONG Result = 0;
+        INT Result = 0;
         SafeArrayGetElement(pErrs, &i, (void*)&Result);
         vecErrors.push_back(Result);
     }

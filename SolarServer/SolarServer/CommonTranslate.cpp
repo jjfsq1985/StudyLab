@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "CommonTranslate.h"
-
+#include "atlcomcli.h"
 #include <string>
 using namespace std;
 
@@ -12,6 +12,71 @@ CommonTranslate::CommonTranslate()
 
 CommonTranslate::~CommonTranslate()
 {
+}
+
+VARIANT CommonTranslate::DataToVariant(QString strData, LONG nType)
+{
+    switch ((VARENUM)nType)
+    {
+    case VARENUM::VT_I1:
+    {
+        QByteArray dataArray = strData.toLatin1();
+        char *pData = dataArray.data();
+        return CComVariant(pData[0]);
+    }
+    case VARENUM::VT_UI1:
+    {
+        QByteArray dataArray = strData.toLatin1();
+        char *pData = dataArray.data();
+        return CComVariant((BYTE)pData[0]);
+    }
+    case VARENUM::VT_I2:                         return CComVariant(strData.toShort());
+    case VARENUM::VT_UI2:                        return CComVariant(strData.toUShort());
+    case VARENUM::VT_I4:                         return CComVariant(strData.toInt());
+    case VARENUM::VT_UI4:                        return CComVariant(strData.toUInt());
+    case VARENUM::VT_R4:                         return CComVariant(strData.toFloat());
+    case VARENUM::VT_R8:                         return CComVariant(strData.toDouble());
+    case VARENUM::VT_CY:                         return  CComVariant(strData.toLongLong());
+    case VARENUM::VT_BOOL:
+    {
+        short sVal = strData.toShort();
+        return (sVal == 0) ? CComVariant(VARIANT_FALSE) : CComVariant(VARIANT_TRUE);
+    }
+    case VARENUM::VT_DATE:
+    {
+        QDateTime timeVal = QDateTime::fromString(strData, "yyyy-MM-dd HH:mm:ss");
+        SYSTEMTIME systime;
+        systime.wYear = timeVal.date().year();
+        systime.wMonth = timeVal.date().month();
+        systime.wDay = timeVal.date().day();
+        systime.wHour = timeVal.time().hour();
+        systime.wMinute = timeVal.time().minute();
+        systime.wSecond = timeVal.time().second();
+        DATE varDate;
+        SystemTimeToVariantTime(&systime, &varDate);
+        return CComVariant(varDate);
+    }
+    case VARENUM::VT_BSTR:
+    {
+        wstring strVal = strData.toStdWString();
+        return CComVariant(strVal.c_str());
+    }
+    case VARENUM::VT_ARRAY | VARENUM::VT_I1: 
+    case VARENUM::VT_ARRAY | VARENUM::VT_UI1:
+    case VARENUM::VT_ARRAY | VARENUM::VT_I2:
+    case VARENUM::VT_ARRAY | VARENUM::VT_UI2:
+    case VARENUM::VT_ARRAY | VARENUM::VT_I4:
+    case VARENUM::VT_ARRAY | VARENUM::VT_UI4:
+    case VARENUM::VT_ARRAY | VARENUM::VT_R4:
+    case VARENUM::VT_ARRAY | VARENUM::VT_R8:
+    case VARENUM::VT_ARRAY | VARENUM::VT_CY:
+    case VARENUM::VT_ARRAY | VARENUM::VT_BOOL:
+    case VARENUM::VT_ARRAY | VARENUM::VT_DATE:
+    case VARENUM::VT_ARRAY | VARENUM::VT_BSTR:
+    case VARENUM::VT_ARRAY | VARENUM::VT_VARIANT:
+    default:
+        return CComVariant();
+    }
 }
 
 QString CommonTranslate::GetDataType(LONG dataType)

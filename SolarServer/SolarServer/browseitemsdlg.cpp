@@ -71,7 +71,7 @@ void BrowseItemsDlg::on_treeGroups_currentItemChanged(QTreeWidgetItem *current, 
     vector<_bstr_t> vecDesc;
     m_pOpcCtrl->QueryItemProperties(cItemID.c_str(), nCount, vecPropID, vecDesc, vecType);
     vector<VARIANT> vecValue;
-    vector<LONG> vecErr;
+    vector<INT> vecErr;
     m_pOpcCtrl->GetItemProperties(cItemID.c_str(), nCount, vecPropID, vecValue, vecErr);
     ui.tableItemProp->clearContents();
     ui.tableItemProp->setRowCount(nCount);

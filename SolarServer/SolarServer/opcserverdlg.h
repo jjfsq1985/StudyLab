@@ -24,7 +24,9 @@ public:
     void EventResponse_DataChange(long NumItems, const  vector<long>& vecClientHandle, const vector<VARIANT>& vecData, const vector<long>& vecQuality, const vector<SYSTEMTIME>& vecStamp);
 
 private:
-    int GetItemIndexInVector(LONG nClientHandle, const vector<ItemInfo>& vecItem);
+    int IndexFromClientHandler(LONG nClientHandle, const vector<ItemInfo>& vecItem);
+    int IndexFromServerHandler(LONG nServerHandle, const vector<ItemInfo>& vecItem);
+    QString GetAccessRight(LONG lRight);
 
 private:
     static void CALLBACK ResponseDataChange(void *pSrcCtrl, long NumItems, const  vector<long>& vecClientHandle, const vector<VARIANT>& vecData, const vector<long>& vecQuality, const vector<SYSTEMTIME>& vecStamp);
@@ -45,9 +47,17 @@ private slots:
     void RemoveItem();
 
 private:
+    typedef struct _tagWriteInfo
+    {
+        LONG ItemSvrHandler;
+        LONG nDataType;
+        bool bDirty;
+        VARIANT varValue;
+    }WriteInfo;
     wstring m_strServerName;
     wstring m_strSelectedGroup;
     map<wstring, vector<ItemInfo> > m_mapItems;
+    vector<WriteInfo> m_vecSelectedItems;
      vector<GroupParam> m_vecGroups;
     class OpcCtrl *m_pOpcCtrl;
 private:

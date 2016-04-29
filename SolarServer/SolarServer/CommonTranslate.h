@@ -9,5 +9,6 @@ public:
     static QString GetDataType(LONG dataType);
     static QString GetDataValue(VARIANT varValue);
     static QString GetTimeStamp(SYSTEMTIME sysTime);
+    static VARIANT DataToVariant(QString strData, LONG nType);
 };
 

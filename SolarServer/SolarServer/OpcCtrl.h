@@ -32,18 +32,18 @@ public:
     bool BrowserBranches(vector<OpcItem>& vecBranches);
     bool BrowserLeafs(_bstr_t sBranch, vector<OpcItem>& vecLeafs);
     bool QueryItemProperties(_bstr_t item, LONG& PropCount, vector<LONG>& vecPropID, vector<_bstr_t>& vecPropDesc, vector<LONG>& vecDataType);
-    bool GetItemProperties(_bstr_t item, LONG PropCount, vector<LONG> vecPropID, vector<VARIANT>& vecPropValue, vector<LONG>& vecErrors);
+    bool GetItemProperties(_bstr_t item, LONG PropCount, vector<LONG> vecPropID, vector<VARIANT>& vecPropValue, vector<INT>& vecErrors);
 
     void SetOpcDataChange(void *pSrcCtrl, CallbackDataChange pFunc);
 
 public:
     bool AddGroup(_bstr_t groupName, LONG UpdateRate, bool bSubscribed);
     bool RemoveGroup(_bstr_t groupName);
-    bool AddOpcItems(vector<_bstr_t> vecItemsId, vector<LONG>& vecServerHandle, vector<LONG>& vecClientHandle, vector<LONG>& vecResult);
-    bool AddOpcItem(_bstr_t ItemID, LONG& lSvrHandle, LONG& lClientHandle, LONG& lResult);
+    bool AddOpcItems(vector<_bstr_t> vecItemsId, vector<LONG>& vecServerHandle, vector<LONG>& vecClientHandle, vector<LONG>& vecAccessRight, vector<INT>& vecResult);
+    bool AddOpcItem(_bstr_t ItemID, LONG& lSvrHandle, LONG& lClientHandle, LONG& lAccessRight, INT& lResult);
     bool RemoveItems(vector<LONG> vecItemsId);
-    bool SyncRead(LONG nItems, const vector<LONG>& vecSvrHander, vector<VARIANT>& vecValue, vector<LONG>& vecErrors, vector<LONG>& vecQualities, vector<SYSTEMTIME>& vecTimeStamps);
-    bool SyncWrite(LONG nItems, const vector<LONG>& vecSvrHander, const vector<VARIANT>& vecValue, vector<LONG>& vecErrors);
+    bool SyncRead(LONG nItems, const vector<LONG>& vecSvrHander, vector<VARIANT>& vecValue, vector<INT>& vecErrors, vector<LONG>& vecQualities, vector<SYSTEMTIME>& vecTimeStamps);
+    bool SyncWrite(LONG nItems, const vector<LONG>& vecSvrHander, const vector<VARIANT>& vecValue, vector<INT>& vecErrors);
 
 protected:
         STDMETHOD(OnDataChange)(long TransactionID, long NumItems, SAFEARRAY  *ClientHandles, SAFEARRAY  *ItemValues, SAFEARRAY  *Qualities, SAFEARRAY  *TimeStamps);

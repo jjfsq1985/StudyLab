@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>848</width>
-    <height>396</height>
+    <width>940</width>
+    <height>440</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>9</x>
      <y>40</y>
-     <width>271</width>
-     <height>351</height>
+     <width>241</width>
+     <height>391</height>
     </rect>
    </property>
    <column>
@@ -31,15 +31,20 @@
   <widget class="QTableWidget" name="opcitemList">
    <property name="geometry">
     <rect>
-     <x>290</x>
+     <x>260</x>
      <y>40</y>
-     <width>551</width>
-     <height>311</height>
+     <width>671</width>
+     <height>351</height>
     </rect>
    </property>
    <column>
     <property name="text">
      <string>ItemID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>AccessRight</string>
     </property>
    </column>
    <column>
@@ -66,8 +71,8 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>360</y>
+     <x>760</x>
+     <y>400</y>
      <width>156</width>
      <height>23</height>
     </rect>
@@ -111,8 +116,8 @@
   <widget class="QPushButton" name="btnEdit">
    <property name="geometry">
     <rect>
-     <x>410</x>
-     <y>360</y>
+     <x>490</x>
+     <y>400</y>
      <width>75</width>
      <height>23</height>
     </rect>

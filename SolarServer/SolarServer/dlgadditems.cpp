@@ -188,12 +188,14 @@ void dlgAddItems::on_BtnAddItems_clicked()
     {
         LONG ServerHandle = 0;
         LONG ClientHandle = 0;
-        LONG lResult = 0;
+        LONG AccessRight = 0;
+        INT lResult = 0;
         int nIndex = vecAddItems[0];
-        if (m_pOpcCtrl->AddOpcItem(_bstr_t(m_vecItems[nIndex].strOpcItemId.c_str()), ServerHandle, ClientHandle, lResult))
+        if (m_pOpcCtrl->AddOpcItem(_bstr_t(m_vecItems[nIndex].strOpcItemId.c_str()), ServerHandle, ClientHandle, AccessRight, lResult))
         {
             m_vecItems[nIndex].OpcItemSvrHandle = ServerHandle;
-            m_vecItems[nIndex].OpcItemClientHandle = ClientHandle;
+            m_vecItems[nIndex].OpcItemClientHandle = ClientHandle;            
+            m_vecItems[nIndex].AccessRight = AccessRight;
             if (SUCCEEDED(lResult))
             {
                 QTableWidgetItem *pTableItem = new QTableWidgetItem(QString("0x%1").arg(lResult, 2, 16,QChar('0')));
@@ -217,14 +219,16 @@ void dlgAddItems::on_BtnAddItems_clicked()
         }
         vector<LONG> vecSvrHandler;
         vector<LONG> vecClientHandle;
-        vector<LONG> vecResult;
-        if (m_pOpcCtrl->AddOpcItems(vecAddItemsID, vecSvrHandler, vecClientHandle, vecResult))
+        vector<LONG> vecAccessRight;
+        vector<INT> vecResult;
+        if (m_pOpcCtrl->AddOpcItems(vecAddItemsID, vecSvrHandler, vecClientHandle, vecAccessRight,vecResult))
         {
             for (int iAdd = 0; iAdd < vecSvrHandler.size(); iAdd++)
             {
                 int nIndex = vecAddItems[iAdd];
                 m_vecItems[nIndex].OpcItemSvrHandle = vecSvrHandler[iAdd];
                 m_vecItems[nIndex].OpcItemClientHandle = vecClientHandle[iAdd];
+                m_vecItems[nIndex].AccessRight = vecAccessRight[iAdd];
                 if (SUCCEEDED(vecResult[iAdd]))
                 {
                     QTableWidgetItem *pTableItem = new QTableWidgetItem(QString("0x%1").arg(vecResult[iAdd], 2, 16, QChar('0')));
