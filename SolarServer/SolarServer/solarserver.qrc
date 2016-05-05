@@ -1,4 +1,5 @@
 <RCC>
-    <qresource prefix="SolarServer">
+    <qresource prefix="/SolarServer">
+        <file>SolarServer.rc</file>
     </qresource>
 </RCC>
