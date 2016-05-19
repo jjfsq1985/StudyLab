@@ -24,8 +24,9 @@ public:
     static vector<struct bufferevent*> m_VecBev;
 
 private:
+    class SolarTcpIpPacket *m_pPacket;
     int m_nListenPort;
-    static void ListenThread(void *pParam);
+    static void* ListenThread(void *pParam);
     static void do_accept(evutil_socket_t listener, short eventVal, void *arg);
     static void read_cb(struct bufferevent *bev, void *arg);
     static void event_cb(struct bufferevent *bev, short event, void *arg);

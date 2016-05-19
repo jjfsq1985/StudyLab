@@ -27,6 +27,7 @@ private:
     map<wstring, vector<ItemInfo> > m_mapItems;
     vector<GroupParam> m_vecGroups;
     class OpcCtrl *m_pOpc;
+    class TcpServer *m_pTcp;
 };
 
 #endif // SOLARSERVER_H

@@ -3,10 +3,13 @@
 
 #include "OpcCtrl.h"
 #include "opclistdlg.h"
+#include "TcpServer.h"
 
 SolarServer::SolarServer(QWidget *parent)
     : QMainWindow(parent)
 {
+    m_pOpc = NULL;
+    m_pTcp = NULL;
     ui.setupUi(this);
 
     InitServer();
@@ -17,6 +20,10 @@ SolarServer::~SolarServer()
     if (m_pOpc != NULL)
         delete m_pOpc;
     m_pOpc = NULL;
+
+    if (m_pTcp != NULL)
+        delete m_pTcp;
+    m_pTcp = NULL;
 }
 
 void SolarServer::InitServer()
@@ -24,6 +31,8 @@ void SolarServer::InitServer()
     m_pOpc = new OpcCtrl();
 
     //³õÊ¼»¯ÍøÂç
+    m_pTcp = new TcpServer();
+    m_pTcp->Init(9999);
 }
 
 void SolarServer::on_actionOPC_Server_triggered()

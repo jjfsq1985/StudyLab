@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "TcpServer.h"
+#include "SolarTcpIpPacket.h"
 
 #include<ws2tcpip.h>
 #include <winsock2.h>
@@ -24,6 +25,7 @@ vector<struct bufferevent*> TcpServer::m_VecBev;
 
 TcpServer::TcpServer()
 {
+    m_pPacket = new SolarTcpIpPacket();
     WSAData wsaData;
     WSAStartup(MAKEWORD(2,2), &wsaData);
 }
@@ -31,19 +33,22 @@ TcpServer::TcpServer()
 
 TcpServer::~TcpServer()
 {
+    m_pPacket->StopParseThread();
+    delete m_pPacket;
     WSACleanup();
 }
 
 
 bool TcpServer::Init(int nPort)
 {
+    m_pPacket->StartParseThread();
     m_nListenPort = nPort;
-    DWORD dwID;
-    CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&ListenThread, this, 0, &dwID);
+    pthread_t tId;
+    pthread_create(&tId, NULL, ListenThread, this);
     return true;
 }
 
-void TcpServer::ListenThread(void *pParam)
+void* TcpServer::ListenThread(void *pParam)
 {
     TcpServer *pSvr = (TcpServer *)pParam;
 
@@ -59,12 +64,12 @@ void TcpServer::ListenThread(void *pParam)
 
     if (bind(listener, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
         perror("bind");
-        return;
+        return NULL;
     }
 
     if (listen(listener, LISTEN_BACKLOG) < 0) {
         perror("listen");
-        return;
+        return NULL;
     }
 
     Tprintf(L"Server Port %d Listening...\n",pSvr->m_nListenPort);
@@ -83,6 +88,7 @@ void TcpServer::ListenThread(void *pParam)
     event_base_dispatch(base);
     event_base_free(base);
     evutil_closesocket(listener);
+    return NULL;
 }
 
 //调用bufferevent_write后会触发该事件，如果bufferevent_setcb中设置了bufferevent_data_cb的话
@@ -201,5 +207,39 @@ struct bufferevent* TcpServer::GetBufferEvent(const char* cIP, int nPort)
 //解析从指定client发出的数据
 bool TcpServer::DealWithData(struct bufferevent *bev, const char*pData, int nLen)
 {
+    evutil_socket_t fd = bufferevent_getfd(bev);
+    struct sockaddr_in sin;
+    int nsocketLen = sizeof(SOCKADDR);
+    char cIPParse[16];
+    ushort port;
+    if (getpeername(fd, (struct sockaddr*)&sin, &nsocketLen) == 0)
+    {
+        inet_ntop(AF_INET, (void *)&sin.sin_addr, cIPParse, 16);
+        port = ntohs(sin.sin_port);
+    }
+
+    m_pPacket->AppendRecvData(nLen, (byte*)pData);
+    SolarPacket* pPacketData = m_pPacket->PullRecvPacket();
+    if (pPacketData != NULL)
+    {
+        switch (pPacketData->byteCmd)
+        {
+        case 0x10:
+            Tprintf(L"recv 0x10 response");
+            break;
+        case 0x11:
+            break;
+        case 0x12:
+            break;
+        case 0x13:
+            break;
+        case 0x14:
+            break;
+        case 0x15:
+            break;
+        }
+
+        m_pPacket->DestroySolarPacket(pPacketData);
+    }
     return false;
 }
