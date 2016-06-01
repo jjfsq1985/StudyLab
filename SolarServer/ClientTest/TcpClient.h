@@ -1,4 +1,6 @@
 #pragma once
+#include "ClientEmulation.h"
+
 class TcpClient
 {
 public:
@@ -9,6 +11,9 @@ public:
     bool Init(const char *cIPAddr, int nPort);
     bool SendData(const char *pData, int nLen);
 
+public:
+    bool m_bConnected;
+
 protected:
     bool m_bConnecting;
     char m_cIPAddr[16];
@@ -18,6 +23,7 @@ protected:
     bool DealWithData(struct bufferevent *bev,const char*pData, int nLen);
 
 private:
+    class ClientEmulation *m_pEmulation;
     class SolarTcpIpPacket *m_pPacket;
     static struct bufferevent *m_pBev;
 

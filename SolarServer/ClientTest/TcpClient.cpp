@@ -12,14 +12,17 @@
 #include "event2\listener.h"
 #include "event2\util.h"
 #include "event2\event.h"
+#include "event2\thread.h"
 
 struct bufferevent * TcpClient::m_pBev = NULL;
 
 TcpClient::TcpClient()
     :m_bConnecting(false)
+    , m_bConnected(false)
     , m_nPort(0)
 {
     m_pPacket = new SolarTcpIpPacket();
+    m_pEmulation = new ClientEmulation(this);
 
     strcpy_s(m_cIPAddr, 16,"127.0.0.1");
     WSAData wsaData;
@@ -32,6 +35,9 @@ TcpClient::~TcpClient()
     m_bConnecting = false;
     m_pPacket->StopParseThread();
     delete m_pPacket;
+    m_pEmulation->StopWork();
+    delete m_pEmulation;
+    m_bConnected = false;
     WSACleanup();
 }
 
@@ -39,6 +45,7 @@ TcpClient::~TcpClient()
 bool TcpClient::Init(const char *cIPAddr, int nPort)
 {
     m_pPacket->StartParseThread();
+    m_pEmulation->StartWork();
     strcpy_s(m_cIPAddr, 16, cIPAddr);
     m_nPort = nPort;
     m_bConnecting = true;
@@ -62,7 +69,7 @@ void* TcpClient::ConnectThread(void *pParam)
     inet_pton(AF_INET, pClient->m_cIPAddr, (void*)&sin.sin_addr);
     sin.sin_port = htons(pClient->m_nPort);
 
-    int nCycle = 0;
+    int nCycle = 15;
     while (pClient->m_bConnecting)
     {
         if (nCycle < 15)
@@ -75,7 +82,13 @@ void* TcpClient::ConnectThread(void *pParam)
         nCycle = 0;
         struct event_base *base = event_base_new();
         assert(base != NULL);
-        struct bufferevent *bev = bufferevent_socket_new(base, -1, BEV_OPT_CLOSE_ON_FREE);
+#if defined (WIN32)
+        evthread_use_windows_threads();
+#else
+        evthread_use_pthreads();
+#endif
+        evthread_make_base_notifiable(base);
+        struct bufferevent *bev = bufferevent_socket_new(base, -1, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
         bufferevent_setcb(bev, read_cb, NULL, event_cb, pClient);
         bufferevent_enable(bev, EV_READ | EV_WRITE | EV_PERSIST);
         //Á¬½Ó
@@ -84,8 +97,6 @@ void* TcpClient::ConnectThread(void *pParam)
             bufferevent_free(bev);
             return NULL;
         }
-        m_pBev = bev;
-
         event_base_dispatch(base);
 
         event_base_free(base);
@@ -113,6 +124,7 @@ void TcpClient::read_cb(struct bufferevent *bev, void *arg)
 
 void TcpClient::event_cb(struct bufferevent *bev, short event, void *arg)
 {
+    TcpClient *pClient = (TcpClient *)arg;
     evutil_socket_t fd = bufferevent_getfd(bev);
     Tprintf(L"fd = %u, ", fd);
     if (event & BEV_EVENT_TIMEOUT)
@@ -121,15 +133,19 @@ void TcpClient::event_cb(struct bufferevent *bev, short event, void *arg)
     }
     else if (event & BEV_EVENT_CONNECTED)
     {
+        pClient->m_pBev = bev;
+        pClient->m_bConnected = true;
         Tprintf(L"Connect okay.\n");
     }
     else if (event & BEV_EVENT_EOF)
     {
+        pClient->m_bConnected = false;
         Tprintf(L"connection closed\n");
         bufferevent_free(bev);
     }
     else if (event & BEV_EVENT_ERROR)
     {
+        pClient->m_bConnected = false;
         Tprintf(L"some other error\n");
         bufferevent_free(bev);
     }
@@ -137,6 +153,8 @@ void TcpClient::event_cb(struct bufferevent *bev, short event, void *arg)
 
 bool TcpClient::SendData(const char *pData, int nLen)
 {
+    if (!m_bConnected)
+        return false;
     if (bufferevent_write(m_pBev, pData, nLen) < 0)
         return false;
     else

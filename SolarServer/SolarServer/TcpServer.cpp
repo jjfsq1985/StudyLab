@@ -12,6 +12,7 @@
 #include "event2\listener.h"
 #include "event2\util.h"
 #include "event2\event.h"
+#include "event2\thread.h"
 
 #define LISTEN_BACKLOG 32
 
@@ -111,8 +112,13 @@ void TcpServer::do_accept(evutil_socket_t listener, short eventVal, void *arg)
     }
 
     Tprintf(L"ACCEPT: fd = %u\n", fd);
-    
-    struct bufferevent *bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE);
+#if defined (WIN32)
+    evthread_use_windows_threads();
+#else
+    evthread_use_pthreads();
+#endif
+    evthread_make_base_notifiable(base);
+    struct bufferevent *bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
     m_VecBev.push_back(bev);
     bufferevent_setcb(bev, read_cb, NULL, event_cb, cbparameter->pSvr);
     bufferevent_enable(bev, EV_READ | EV_WRITE | EV_PERSIST);
@@ -232,6 +238,12 @@ bool TcpServer::DealWithData(struct bufferevent *bev, const char*pData, int nLen
         case 0x12:
             break;
         case 0x13:
+        {
+            int nRecvlen = pPacketData->nDataLen;
+            CCDParam param;
+            memcpy(&param, pPacketData->m_Data, sizeof(CCDParam));
+            Tprintf(L"recv CCD Param: %d", param.nSawMarkGroove);
+        }
             break;
         case 0x14:
             break;

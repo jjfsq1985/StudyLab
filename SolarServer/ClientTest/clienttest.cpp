@@ -8,7 +8,7 @@ ClientTest::ClientTest(QWidget *parent)
     ui.setupUi(this);
 
     m_pClient = new TcpClient();
-    m_pClient->Init("127.0.0.1", 9999);
+    m_pClient->Init("192.168.1.123", 9999);
 }
 
 ClientTest::~ClientTest()

@@ -35,6 +35,7 @@ void SolarTcpIpPacket::StartParseThread()
 void SolarTcpIpPacket::StopParseThread()
 {
     m_threadRun = false;
+    pthread_cond_signal(&m_ParseCond);
     pthread_join(m_threadId, NULL);
 }
 
@@ -44,7 +45,7 @@ void SolarTcpIpPacket::AppendRecvData(int nLen, byte *pData)
         return;
     pthread_mutex_lock(&m_ParseMutex);
     m_vecRecvData.resize(m_nRecvLen + nLen);
-    std::copy(pData, pData+nLen, std::back_inserter(m_vecRecvData));
+    std::copy(pData, pData + nLen, m_vecRecvData.begin() + m_nRecvLen);
     m_nRecvLen += nLen;
     pthread_cond_signal(&m_ParseCond);
     pthread_mutex_unlock(&m_ParseMutex);
@@ -103,7 +104,7 @@ vector<byte> SolarTcpIpPacket::PickPacket(vector<byte> vecData, int nStart, int 
             if (nPushLen == nCmdDataLen + 9)
             {
                 bRet = true;
-                RemoveLen = i;
+                RemoveLen = i+1;
                 break;
             }
         }
@@ -117,6 +118,11 @@ void SolarTcpIpPacket::ParseRecvData()
     {
         pthread_mutex_lock(&m_ParseMutex);
         pthread_cond_wait(&m_ParseCond, &m_ParseMutex);
+        if (!m_threadRun)
+        {
+            pthread_mutex_unlock(&m_ParseMutex);
+            break;
+        }
         if (m_nRecvLen > 9)
         {
             //Ω‚ŒˆData
@@ -124,7 +130,7 @@ void SolarTcpIpPacket::ParseRecvData()
             int nEndPos = 0;
             while (nPos < m_nRecvLen)
             {
-                if (nPos + 9 < m_nRecvLen)
+                if (nPos + 9 >= m_nRecvLen)
                     break;
                 if (m_vecRecvData[nPos] == SOLAR_PACKET_HEADER)
                 {
@@ -146,6 +152,7 @@ void SolarTcpIpPacket::ParseRecvData()
                         packetSingle->xorData = vecPacket[nLen - 1];
                         assert(CalcXOR(vecPacket) == packetSingle->xorData);
                         m_lstParsedPacket.push_back(packetSingle);
+                        nPos += nRemoveLen;
                     }
                 }                
             }
@@ -219,7 +226,7 @@ byte * SolarTcpIpPacket::MakeupPacket(const SolarPacket* cmdData, int& nRetLen)
     byte*pRetData = new byte[nRetLen];
     pRetData[0] = SOLAR_PACKET_HEADER;
     int nPos = 1;
-    for (int n = 0; n < nPackLen; n++)
+    for (int n = 1; n < nPackLen; n++)//HeaderÃ¯π˝
     {
         if (pSrcData[n] == SOLAR_ESCAPE_CHAR)
         {

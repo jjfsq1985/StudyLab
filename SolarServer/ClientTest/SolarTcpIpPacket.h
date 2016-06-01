@@ -27,7 +27,7 @@ public:
 
 public:
     static byte * MakeupPacket(const SolarPacket* cmdData, int& nRetLen);
-    void DestroySolarPacket(SolarPacket* packet);
+    static void DestroySolarPacket(SolarPacket* packet);
 
 public:
     void StartParseThread();

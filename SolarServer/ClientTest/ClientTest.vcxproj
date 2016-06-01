@@ -84,6 +84,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ClientEmulation.cpp" />
     <ClCompile Include="clienttest.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_clienttest.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -106,6 +107,7 @@
     <ClCompile Include="TcpClient.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ClientEmulation.h" />
     <ClInclude Include="GeneratedFiles\ui_clienttest.h" />
     <ClInclude Include="SolarTcpIpPacket.h" />
     <ClInclude Include="TcpClient.h" />

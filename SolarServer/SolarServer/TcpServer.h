@@ -4,6 +4,22 @@ using std::vector;
 
 #include "event2\util.h"
 
+typedef struct _tagCCDPar
+{
+    ushort nSawMarkGroove;
+    ushort SawMarkStep;
+    ushort SawMarkEdge;
+    ushort sori;
+    ushort bow;
+    ushort chips;
+    ushort breakages;
+    ushort holes;
+    ushort cracks;
+    ushort NVCD;//าþมั
+    ushort stain; //ิเฮÛ
+    ushort glue; //
+}CCDParam;
+
 class TcpServer
 {
 public:
