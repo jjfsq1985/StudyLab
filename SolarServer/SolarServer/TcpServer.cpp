@@ -26,7 +26,7 @@ vector<struct bufferevent*> TcpServer::m_VecBev;
 
 TcpServer::TcpServer()
 {
-    m_pPacket = new SolarTcpIpPacket();
+    m_mapPacket.clear();
     WSAData wsaData;
     WSAStartup(MAKEWORD(2,2), &wsaData);
 }
@@ -34,15 +34,17 @@ TcpServer::TcpServer()
 
 TcpServer::~TcpServer()
 {
-    m_pPacket->StopParseThread();
-    delete m_pPacket;
+    for (map<evutil_socket_t, class SolarTcpIpPacket *>::iterator it = m_mapPacket.begin(); it != m_mapPacket.end(); it++)
+    {
+        it->second->StopParseThread();
+        delete it->second;
+    }
     WSACleanup();
 }
 
 
 bool TcpServer::Init(int nPort)
 {
-    m_pPacket->StartParseThread();
     m_nListenPort = nPort;
     pthread_t tId;
     pthread_create(&tId, NULL, ListenThread, this);
@@ -118,6 +120,9 @@ void TcpServer::do_accept(evutil_socket_t listener, short eventVal, void *arg)
     evthread_use_pthreads();
 #endif
     evthread_make_base_notifiable(base);
+    class SolarTcpIpPacket *pPacket = new class SolarTcpIpPacket();
+    cbparameter->pSvr->m_mapPacket[fd] = pPacket;
+    pPacket->StartParseThread();
     struct bufferevent *bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
     m_VecBev.push_back(bev);
     bufferevent_setcb(bev, read_cb, NULL, event_cb, cbparameter->pSvr);
@@ -167,12 +172,22 @@ void TcpServer::event_cb(struct bufferevent *bev, short event, void *arg)
     {
         Tprintf(L"connection closed\n");
         pSvr->RemoveFromVec(bev);
+        if (pSvr->m_mapPacket.find(fd) != pSvr->m_mapPacket.end())
+        {
+            delete pSvr->m_mapPacket[fd];
+            pSvr->m_mapPacket.erase(fd);
+        }
         bufferevent_free(bev);
     }
     else if (event & BEV_EVENT_ERROR)
     {
         Tprintf(L"some other error\n");
         pSvr->RemoveFromVec(bev);
+        if (pSvr->m_mapPacket.find(fd) != pSvr->m_mapPacket.end())
+        {
+            delete pSvr->m_mapPacket[fd];
+            pSvr->m_mapPacket.erase(fd);
+        }
         bufferevent_free(bev);
     }
 }
@@ -214,6 +229,8 @@ struct bufferevent* TcpServer::GetBufferEvent(const char* cIP, int nPort)
 bool TcpServer::DealWithData(struct bufferevent *bev, const char*pData, int nLen)
 {
     evutil_socket_t fd = bufferevent_getfd(bev);
+    if (m_mapPacket.find(fd) == m_mapPacket.end())
+        return false;
     struct sockaddr_in sin;
     int nsocketLen = sizeof(SOCKADDR);
     char cIPParse[16];
@@ -224,8 +241,8 @@ bool TcpServer::DealWithData(struct bufferevent *bev, const char*pData, int nLen
         port = ntohs(sin.sin_port);
     }
 
-    m_pPacket->AppendRecvData(nLen, (byte*)pData);
-    SolarPacket* pPacketData = m_pPacket->PullRecvPacket();
+    m_mapPacket[fd]->AppendRecvData(nLen, (byte*)pData);
+    SolarPacket* pPacketData = m_mapPacket[fd]->PullRecvPacket();
     if (pPacketData != NULL)
     {
         switch (pPacketData->byteCmd)
@@ -251,7 +268,7 @@ bool TcpServer::DealWithData(struct bufferevent *bev, const char*pData, int nLen
             break;
         }
 
-        m_pPacket->DestroySolarPacket(pPacketData);
+        SolarTcpIpPacket::DestroySolarPacket(pPacketData);
     }
     return false;
 }

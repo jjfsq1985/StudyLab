@@ -195,7 +195,7 @@ bool TcpClient::DealWithData(struct bufferevent *bev, const char*pData, int nLen
             break;
         }
 
-        m_pPacket->DestroySolarPacket(pPacketData);
+        SolarTcpIpPacket::DestroySolarPacket(pPacketData);
     }
     return false;
 }

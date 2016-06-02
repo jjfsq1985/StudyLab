@@ -32,7 +32,7 @@ public:
 public:
     void StartParseThread();
     void StopParseThread();
-    void AppendRecvData(int nLen, byte *pData);
+    void AppendRecvData(int nLen, byte *pData);    
     SolarPacket* PullRecvPacket();
 
 public:

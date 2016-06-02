@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
-using std::vector; 
+#include <map>
+using namespace std;
 
 #include "event2\util.h"
 
@@ -40,7 +41,7 @@ public:
     static vector<struct bufferevent*> m_VecBev;
 
 private:
-    class SolarTcpIpPacket *m_pPacket;
+    map<evutil_socket_t, class SolarTcpIpPacket *> m_mapPacket;    
     int m_nListenPort;
     static void* ListenThread(void *pParam);
     static void do_accept(evutil_socket_t listener, short eventVal, void *arg);

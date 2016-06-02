@@ -138,7 +138,6 @@ void SolarTcpIpPacket::ParseRecvData()
                     vector<byte> vecPacket = PickPacket(m_vecRecvData, nPos, m_nRecvLen, nRemoveLen);
                     if (nRemoveLen > 0)
                     {
-                        m_vecRecvData.erase(m_vecRecvData.begin(), m_vecRecvData.begin() + nRemoveLen);
                         int nLen = vecPacket.size();
                         SolarPacket* packetSingle = new SolarPacket();
                         packetSingle->nDstAddr = (vecPacket[1] << 8) + vecPacket[2];
@@ -154,8 +153,14 @@ void SolarTcpIpPacket::ParseRecvData()
                         m_lstParsedPacket.push_back(packetSingle);
                         nPos += nRemoveLen;
                     }
-                }                
+                }
+                else
+                {
+                    nPos++;
+                }
             }
+            m_vecRecvData.erase(m_vecRecvData.begin(), m_vecRecvData.begin() + nPos);
+            m_nRecvLen -= nPos;
         }
         pthread_mutex_unlock(&m_ParseMutex);
     }
