@@ -5,7 +5,6 @@ using namespace std;
 
 typedef struct _tagCCDPar
 {
-    int nValid;
     ushort nSawMarkGroove;
     ushort SawMarkStep;
     ushort SawMarkEdge;
@@ -36,7 +35,7 @@ public:
 
 private:
     class TcpClient *m_pClient;
-    CCDParam GetData();
+    CCDParam* PopCCDdata();
     static void* CCDdataEmulation(void * pParam);
     static void* SendSvr(void* pParam);
 private:
@@ -44,7 +43,7 @@ private:
     pthread_t m_threadId;
     pthread_t m_SendId;
     pthread_mutex_t m_mutex;
-    list<CCDParam> m_lstccdpar;
+    list<CCDParam*> m_lstccdpar;
     
 };
 

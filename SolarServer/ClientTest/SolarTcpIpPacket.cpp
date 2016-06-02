@@ -134,7 +134,7 @@ void SolarTcpIpPacket::ParseRecvData()
                     break;
                 if (m_vecRecvData[nPos] == SOLAR_PACKET_HEADER)
                 {
-                    int nRemoveLen = 0;
+                    int nRemoveLen = 0;// 已包含nPos值
                     vector<byte> vecPacket = PickPacket(m_vecRecvData, nPos, m_nRecvLen, nRemoveLen);
                     if (nRemoveLen > 0)
                     {
@@ -151,7 +151,11 @@ void SolarTcpIpPacket::ParseRecvData()
                         packetSingle->xorData = vecPacket[nLen - 1];
                         assert(CalcXOR(vecPacket) == packetSingle->xorData);
                         m_lstParsedPacket.push_back(packetSingle);
-                        nPos += nRemoveLen;
+                        nPos = nRemoveLen;
+                    }
+                    else
+                    {
+                        break;//当前包还没接受完整
                     }
                 } 
                 else

@@ -15,6 +15,11 @@ ClientEmulation::ClientEmulation(class TcpClient *pClient)
 
 ClientEmulation::~ClientEmulation()
 {
+    for (list<CCDParam*>::iterator it = m_lstccdpar.begin(); it != m_lstccdpar.end(); it++)
+    {
+        delete (*it);
+    }
+    m_lstccdpar.clear();
     pthread_mutex_destroy(&m_mutex);
 }
 
@@ -40,8 +45,8 @@ void ClientEmulation::SendServerProc()
 {
     if (!m_pClient->m_bConnected)
         return;
-    CCDParam param = GetData();
-    if (param.nValid != 1)
+    CCDParam* pParam = PopCCDdata();
+    if (pParam == NULL)
         return;
     SolarPacket *pPacket = new SolarPacket();
     pPacket->nDstAddr = 4;
@@ -49,11 +54,11 @@ void ClientEmulation::SendServerProc()
     pPacket->byteCmd = 0x13;
     pPacket->nDataLen = sizeof(CCDParam);
     pPacket->m_Data = new byte[sizeof(CCDParam)];
-    memcpy(pPacket->m_Data, &param, sizeof(CCDParam));
+    memcpy(pPacket->m_Data, pParam, sizeof(CCDParam));
     int nLen = 0;
     byte * pSend = SolarTcpIpPacket::MakeupPacket(pPacket, nLen);
-
     m_pClient->SendData((char*)pSend, nLen);
+    delete pParam;
     delete[] pSend;
 
     SolarTcpIpPacket::DestroySolarPacket(pPacket);
@@ -75,42 +80,40 @@ void* ClientEmulation::CCDdataEmulation(void * pParam)
 
 void ClientEmulation::CCDEmulation()
 {
-    CCDParam param;
+    CCDParam *pParam = NULL;
     while (m_threadRun)
     {
         pthread_mutex_lock(&m_mutex);
-        param.nSawMarkGroove = rand() % 3;
-        param.SawMarkStep = rand() % 3;
-        param.SawMarkEdge = rand() % 3;
-        param.sori = rand() % 10;
-        param.bow = rand() % 10;
-        param.chips = rand() % 3;
-        param.breakages = rand() % 3;
-        param.holes = 0;
-        param.cracks = 0;
-        param.NVCD = 0;
-        param.stain = 0;
-        param.glue = 0;
-        param.nValid = 1;
-        m_lstccdpar.push_back(param);
+        pParam = new CCDParam;
+        pParam->nSawMarkGroove = rand() % 3;
+        pParam->SawMarkStep = rand() % 3;
+        pParam->SawMarkEdge = rand() % 3;
+        pParam->sori = rand() % 10;
+        pParam->bow = rand() % 10;
+        pParam->chips = rand() % 3;
+        pParam->breakages = rand() % 3;
+        pParam->holes = 0;
+        pParam->cracks = 0;
+        pParam->NVCD = 0;
+        pParam->stain = 0;
+        pParam->glue = 0;
+        m_lstccdpar.push_back(pParam);
         pthread_mutex_unlock(&m_mutex);
         Sleep(100);
     }
 }
 
-CCDParam ClientEmulation::GetData()
+CCDParam* ClientEmulation::PopCCDdata()
 {
     if (m_lstccdpar.size() <= 0)
     {
-        CCDParam data;
-        data.nValid = 0;
-        return data;
+        return NULL;
     }
     pthread_mutex_lock(&m_mutex);
 
-    CCDParam data = m_lstccdpar.front();
+    CCDParam* pCCDdata = m_lstccdpar.front();
     m_lstccdpar.pop_front();
     pthread_mutex_unlock(&m_mutex);
-    return data;
+    return pCCDdata;
 
 }
