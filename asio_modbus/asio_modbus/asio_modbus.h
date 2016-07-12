@@ -2,7 +2,6 @@
 #define MODBUS_H
 
 #include <stdint.h>
-#include "modbus-version.h"
 
 # if defined(ASIO_MODBUS_EXPORTS)
 #  define MODBUS_API __declspec(dllexport)

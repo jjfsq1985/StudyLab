@@ -13,10 +13,7 @@ using namespace std;
 /* Internal use */
 #define MSG_LENGTH_UNDEFINED -1
 
-/* Exported version */
-const unsigned int asiomodbus_version_major = ASIOMODBUS_VERSION_MAJOR;
-const unsigned int asiomodbus_version_minor = ASIOMODBUS_VERSION_MINOR;
-const unsigned int asiomodbus_version_micro = ASIOMODBUS_VERSION_MICRO;
+const string VERSION_STRING = "0.1.1";
 
 /* Max between RTU and TCP max adu length (so TCP) */
 #define MAX_MESSAGE_LENGTH 260
@@ -880,9 +877,9 @@ int modbus_reply(modbus_t *ctx, const uint8_t *req,
         /* Run indicator status to ON */
         rsp[rsp_length++] = 0xFF;
         /* AMB + length of LIBMODBUS_VERSION_STRING */
-        str_len = 3 + strlen(ASIOMODBUS_VERSION_STRING);
-#define VerInfo "AMB"ASIOMODBUS_VERSION_STRING
-        memcpy(rsp + rsp_length, VerInfo, str_len);
+		str_len = 3 + VERSION_STRING.length();
+		string strVer = "AMB" + VERSION_STRING;
+		memcpy(rsp + rsp_length, strVer.c_str(), str_len);
         rsp_length += str_len;
         rsp[byte_count_pos] = rsp_length - byte_count_pos - 1;
     }

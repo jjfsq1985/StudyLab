@@ -14,4 +14,3 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "modbus-version.h"
