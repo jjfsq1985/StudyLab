@@ -4,7 +4,7 @@
 
 #include<ws2tcpip.h>
 #include <winsock2.h>
-#pragma comment(lib,"wsock32.lib")
+//#pragma comment(lib,"wsock32.lib")
 #pragma comment(lib, "ws2_32.lib")
 
 #include "event2\bufferevent.h"
