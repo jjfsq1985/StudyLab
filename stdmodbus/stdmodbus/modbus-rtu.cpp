@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include <fcntl.h>
-
 #include "modbus-private.h"
 
 #include "modbus-rtu.h"

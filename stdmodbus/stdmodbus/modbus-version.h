@@ -28,4 +28,3 @@
       ASIOMODBUS_VERSION_MICRO >= (micro)))
 
 #endif /* MODBUS_VERSION_H */
-

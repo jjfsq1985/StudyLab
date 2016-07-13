@@ -1,10 +1,8 @@
 #include "stdafx.h"
-# include <stdint.h>
+#include <stdint.h>
 
-#  include <winsock2.h>
-
+# include <winsock2.h>
 #include "asio_modbus.h"
-
 
 static inline uint16_t bswap_16(uint16_t x)
 {
