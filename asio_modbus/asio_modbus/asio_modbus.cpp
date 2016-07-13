@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include <stdarg.h>
-#include <errno.h>
 #include <limits.h>
 #include <time.h>
 

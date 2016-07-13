@@ -42,6 +42,15 @@
     <ClInclude Include="asio_modbus.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="interface_backend.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="modbus_tcp_backend.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="modbus_common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -60,6 +69,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="modbus-tcp.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="modbus_tcp_backend.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="modbus_common.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

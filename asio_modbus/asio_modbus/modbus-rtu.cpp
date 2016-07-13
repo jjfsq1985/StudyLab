@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <errno.h>
 #include <fcntl.h>
 
 #include "modbus-private.h"

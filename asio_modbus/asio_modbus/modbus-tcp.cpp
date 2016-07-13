@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <errno.h>
 #include <signal.h>
 #include <sys/types.h>
 

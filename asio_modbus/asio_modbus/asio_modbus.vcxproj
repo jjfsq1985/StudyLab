@@ -85,6 +85,9 @@
     <ClInclude Include="modbus-rtu.h" />
     <ClInclude Include="modbus-tcp-private.h" />
     <ClInclude Include="modbus-tcp.h" />
+    <ClInclude Include="interface_backend.h" />
+    <ClInclude Include="modbus_common.h" />
+    <ClInclude Include="modbus_tcp_backend.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -101,6 +104,8 @@
     <ClCompile Include="modbus-data.cpp" />
     <ClCompile Include="modbus-rtu.cpp" />
     <ClCompile Include="modbus-tcp.cpp" />
+    <ClCompile Include="modbus_common.cpp" />
+    <ClCompile Include="modbus_tcp_backend.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
