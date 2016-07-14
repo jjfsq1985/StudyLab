@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\export">
+      <UniqueIdentifier>{a273ff7f-6f97-422a-8f3c-1715c765bd62}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -27,19 +30,10 @@
     <ClInclude Include="modbus-private.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="modbus-rtu.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="modbus-rtu-private.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="modbus-tcp.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="modbus-tcp-private.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="asio_modbus.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="interface_backend.h">
@@ -57,24 +51,27 @@
     <ClInclude Include="modbus_tcpPI_backend.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="stdmodbus.h">
+      <Filter>头文件\export</Filter>
+    </ClInclude>
+    <ClInclude Include="modbus_def.h">
+      <Filter>头文件\export</Filter>
+    </ClInclude>
+    <ClInclude Include="modbus-data.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="modbus-tcpPI-private.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="asio_modbus.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="modbus-data.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="modbus-rtu.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="modbus-tcp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="modbus_tcp_backend.cpp">
@@ -87,6 +84,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="modbus_tcpPI_backend.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="stdmodbus.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

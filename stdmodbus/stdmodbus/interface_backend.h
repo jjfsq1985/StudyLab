@@ -1,7 +1,51 @@
 #pragma once
 
-#include "asio_modbus.h"
+#include "modbus_def.h"
 #include "modbus-private.h"
+
+class Lock
+{
+private:
+    CRITICAL_SECTION m_cs;
+
+public:
+    Lock()
+    {
+        InitializeCriticalSection(&m_cs);
+    }
+    ~Lock()
+    {
+        DeleteCriticalSection(&m_cs);
+    }
+    void Enter()
+    {
+        EnterCriticalSection(&m_cs);
+    }
+
+    void Leave()
+    {
+        LeaveCriticalSection(&m_cs);
+    }
+};
+
+class Singleton
+{
+private:
+    class Lock m_lock;
+
+public:
+    Singleton(Lock s_lock) : m_lock(s_lock)
+    {
+        m_lock.Enter();
+    }
+
+    ~Singleton()
+    {
+        m_lock.Leave();
+    }
+};
+
+static Lock modbus_lock_cs; //线程安全，单例临界区
 
 class interface_backend
 {

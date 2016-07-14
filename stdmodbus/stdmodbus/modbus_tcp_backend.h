@@ -31,12 +31,14 @@
 
 class modbus_tcp_backend : public interface_backend
 {
-public:
+protected:
     modbus_tcp_backend();
+    static modbus_tcp_backend * m_pInstance;
+public:
+    static modbus_tcp_backend * GetInstance();
     virtual ~modbus_tcp_backend();
 
 protected:
-    int tcp_init_win32();
     int tcp_set_ipv4_options(int s);
     int connect_net(int sockfd, const struct sockaddr *addr, socklen_t addrlen, const struct timeval *ro_tv);
 

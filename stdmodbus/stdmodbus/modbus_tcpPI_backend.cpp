@@ -1,15 +1,36 @@
 #include "stdafx.h"
 #include "modbus_tcpPI_backend.h"
 
-#include "modbus-tcp-private.h"
+#include "modbus-tcpPI-private.h"
+#include "modbus_common.h"
+
+modbus_tcpPI_backend* modbus_tcpPI_backend::m_pInstance = NULL;
 
 modbus_tcpPI_backend::modbus_tcpPI_backend()
+    :modbus_tcp_backend()
 {
 }
 
 
 modbus_tcpPI_backend::~modbus_tcpPI_backend()
 {
+    if (modbus_tcpPI_backend::m_pInstance)
+        delete modbus_tcpPI_backend::m_pInstance;
+}
+
+
+modbus_tcpPI_backend * modbus_tcpPI_backend::GetInstance()
+{
+    if (m_pInstance == NULL)  //判断是否第一次调用 
+    {
+        //实现线程安全，用Singleton实现异常安全  
+        //Singleton析构总是发生的无论是因为异常抛出还是语句块结束。  
+        Singleton sLock(modbus_lock_cs);
+
+        if (m_pInstance == NULL)
+            m_pInstance = new modbus_tcpPI_backend();
+    }
+    return m_pInstance;
 }
 
 /* Establishes a modbus TCP PI connection with a Modbus server. */
@@ -21,7 +42,7 @@ int modbus_tcpPI_backend::modbus_connect(modbus_t *ctx)
     struct addrinfo ai_hints;
     modbus_tcp_pi_t *ctx_tcp_pi = (modbus_tcp_pi_t *)ctx->backend_data;
 
-    if (tcp_init_win32() == -1) {
+    if (modbus_common::tcp_init_win32() == -1) {
         return -1;
     }
 

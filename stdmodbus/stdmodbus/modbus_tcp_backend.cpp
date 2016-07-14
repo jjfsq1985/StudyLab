@@ -4,6 +4,7 @@
 #include "modbus-tcp-private.h"
 #include "modbus_common.h"
 
+modbus_tcp_backend * modbus_tcp_backend::m_pInstance = NULL;
 
 modbus_tcp_backend::modbus_tcp_backend()
 {
@@ -11,18 +12,39 @@ modbus_tcp_backend::modbus_tcp_backend()
     header_length = _MODBUS_TCP_HEADER_LENGTH;
     checksum_length = _MODBUS_TCP_CHECKSUM_LENGTH;
     max_adu_length = MODBUS_TCP_MAX_ADU_LENGTH;
-    tcp_init_win32();
+    modbus_common::tcp_init_win32();
+}
+
+modbus_tcp_backend * modbus_tcp_backend::GetInstance()
+{
+    if (m_pInstance == NULL)  //判断是否第一次调用 
+    {
+        //实现线程安全，用Singleton实现异常安全  
+        //Singleton析构总是发生的无论是因为异常抛出还是语句块结束。  
+        Singleton sLock(modbus_lock_cs);
+
+        if (m_pInstance == NULL)
+            m_pInstance = new modbus_tcp_backend();
+    }
+    return m_pInstance;
 }
 
 
 modbus_tcp_backend::~modbus_tcp_backend()
 {
+    if (modbus_tcp_backend::m_pInstance)
+        delete modbus_tcp_backend::m_pInstance;
 }
 
 int modbus_tcp_backend::modbus_set_slave(modbus_t*ctx, int slave)
 {
     /* Broadcast address is 0 (MODBUS_BROADCAST_ADDRESS) */
     if (slave >= 0 && slave <= 247) {
+        ctx->slave = slave;
+    }
+    else if (slave == MODBUS_TCP_SLAVE) {
+        /* The special value MODBUS_TCP_SLAVE (0xFF) can be used in TCP mode to
+        * restore the default value. */
         ctx->slave = slave;
     }
     else {
@@ -147,20 +169,6 @@ int modbus_tcp_backend::modbus_pre_check_confirmation(modbus_t *ctx, const uint8
     return 0;
 }
 
-int modbus_tcp_backend::tcp_init_win32()
-{
-    /* Initialise Windows Socket API */
-    WSADATA wsaData;
-
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-        fprintf(stderr, "WSAStartup() returned error code %d\n",
-            (unsigned int)GetLastError());
-        errno = EIO;
-        return -1;
-    }
-    return 0;
-}
-
 int modbus_tcp_backend::tcp_set_ipv4_options(int s)
 {
     int rc;
@@ -234,7 +242,7 @@ int modbus_tcp_backend::modbus_connect(modbus_t *ctx)
     modbus_tcp_t *ctx_tcp = (modbus_tcp_t *)ctx->backend_data;
     int flags = SOCK_STREAM;
 
-    if (tcp_init_win32() == -1) {
+    if (modbus_common::tcp_init_win32() == -1) {
         return -1;
     }
 

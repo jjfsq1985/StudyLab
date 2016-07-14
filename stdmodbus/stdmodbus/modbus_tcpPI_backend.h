@@ -5,8 +5,11 @@
 //IPv6
 class modbus_tcpPI_backend : public modbus_tcp_backend
 {
-public:
+private:
     modbus_tcpPI_backend();
+    static modbus_tcpPI_backend * m_pInstance;
+public:    
+    static modbus_tcpPI_backend * GetInstance();
     virtual ~modbus_tcpPI_backend();
 
 public:

@@ -4,6 +4,8 @@
 #include "modbus-rtu-private.h"
 #include "modbus_common.h"
 
+modbus_rtu_backend * modbus_rtu_backend::m_pInstance = NULL;
+
 modbus_rtu_backend::modbus_rtu_backend()
 {
     backend_type = _MODBUS_BACKEND_TYPE_RTU;
@@ -12,9 +14,25 @@ modbus_rtu_backend::modbus_rtu_backend()
     max_adu_length = MODBUS_RTU_MAX_ADU_LENGTH;
 }
 
+modbus_rtu_backend * modbus_rtu_backend::GetInstance()
+{
+    if (m_pInstance == NULL)  //判断是否第一次调用 
+    {
+        //实现线程安全，用Singleton实现异常安全  
+        //Singleton析构总是发生的无论是因为异常抛出还是语句块结束。  
+        Singleton sLock(modbus_lock_cs);
+
+        if (m_pInstance == NULL)
+            m_pInstance = new modbus_rtu_backend();
+    }
+    return m_pInstance;
+}
+
 
 modbus_rtu_backend::~modbus_rtu_backend()
 {
+    if (modbus_rtu_backend::m_pInstance)
+        delete modbus_rtu_backend::m_pInstance;
 }
 
 /* Define the slave ID of the remote device to talk in master mode or set the

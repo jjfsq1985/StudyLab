@@ -13,8 +13,11 @@
 
 class modbus_rtu_backend : public interface_backend
 {
-public:
+private:
     modbus_rtu_backend();
+    static modbus_rtu_backend * m_pInstance;
+public:
+    static modbus_rtu_backend * GetInstance();
     virtual ~modbus_rtu_backend();
 
 public:
