@@ -35,6 +35,26 @@ modbus_rtu_backend::~modbus_rtu_backend()
         delete modbus_rtu_backend::m_pInstance;
 }
 
+unsigned int modbus_rtu_backend::modbus_backend_type()
+{
+    return backend_type;
+}
+
+unsigned int modbus_rtu_backend::modbus_header_length()
+{
+    return header_length;
+}
+
+unsigned int modbus_rtu_backend::modbus_checksum_length()
+{
+    return checksum_length;
+}
+
+unsigned int modbus_rtu_backend::modbus_max_adu_length()
+{
+    return max_adu_length;
+}
+
 /* Define the slave ID of the remote device to talk in master mode or set the
 * internal slave ID in slave mode */
 int modbus_rtu_backend::modbus_set_slave(modbus_t*ctx, int slave)
@@ -491,8 +511,9 @@ int modbus_rtu_backend::modbus_select(modbus_t *ctx, fd_set *rset, struct timeva
 
 void modbus_rtu_backend::modbus_free(modbus_t *ctx)
 {
-    free(((modbus_rtu_t*)ctx->backend_data)->device);
-    free(ctx->backend_data);
-    free(ctx);
+    modbus_rtu_t *ctx_rtu = (modbus_rtu_t*)ctx->backend_data;
+    delete[] ctx_rtu->device;
+    delete ctx_rtu;
+    delete ctx;
 }
 

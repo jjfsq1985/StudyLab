@@ -36,6 +36,26 @@ modbus_tcp_backend::~modbus_tcp_backend()
         delete modbus_tcp_backend::m_pInstance;
 }
 
+unsigned int modbus_tcp_backend::modbus_backend_type()
+{
+    return backend_type;
+}
+
+unsigned int modbus_tcp_backend::modbus_header_length()
+{
+    return header_length;
+}
+
+unsigned int modbus_tcp_backend::modbus_checksum_length()
+{
+    return checksum_length;
+}
+
+unsigned int modbus_tcp_backend::modbus_max_adu_length()
+{
+    return max_adu_length;
+}
+
 int modbus_tcp_backend::modbus_set_slave(modbus_t*ctx, int slave)
 {
     /* Broadcast address is 0 (MODBUS_BROADCAST_ADDRESS) */
@@ -344,6 +364,7 @@ int modbus_tcp_backend::modbus_select(modbus_t *ctx, fd_set *rset, struct timeva
 
 void modbus_tcp_backend::modbus_free(modbus_t *ctx)
 {
-    free(ctx->backend_data);
-    free(ctx);
+    modbus_tcp_t *ctx_tcp = (modbus_tcp_t *)ctx->backend_data;
+    delete ctx_tcp;
+    delete ctx;
 }

@@ -135,7 +135,7 @@ int modbus_get_header_length(modbus_t *ctx)
         return -1;
     }
 
-    return ctx->backend->header_length;
+    return ctx->backend->modbus_header_length();
 }
 
 int modbus_connect(modbus_t *ctx)
@@ -529,7 +529,7 @@ int modbus_write_and_read_registers(modbus_t *ctx, int write_addr, int write_nb,
         if (rc == -1)
             return -1;
 
-        offset = ctx->backend->header_length;
+        offset = ctx->backend->modbus_header_length();
         for (i = 0; i < rc; i++) {
             /* shift reg hi_byte to temp OR with lo_byte */
             dest[i] = (rsp[offset + 2 + (i << 1)] << 8) |
@@ -573,7 +573,7 @@ int modbus_report_slave_id(modbus_t *ctx, int max_dest, uint8_t *dest)
         if (rc == -1)
             return -1;
 
-        offset = ctx->backend->header_length + 2;
+        offset = ctx->backend->modbus_header_length() + 2;
 
         /* Byte count, slave id, run indicator status and
         additional data. Truncate copy to max_dest. */
@@ -597,13 +597,7 @@ modbus_mapping_t* modbus_mapping_new_start_address(
     unsigned int start_registers, unsigned int nb_registers,
     unsigned int start_input_registers, unsigned int nb_input_registers)
 {
-    modbus_mapping_t *mb_mapping;
-
-    mb_mapping = (modbus_mapping_t *)malloc(sizeof(modbus_mapping_t));
-    if (mb_mapping == NULL) {
-        return NULL;
-    }
-
+    modbus_mapping_t *mb_mapping = new modbus_mapping_t;
     /* 0X */
     mb_mapping->nb_bits = nb_bits;
     mb_mapping->start_bits = start_bits;
@@ -612,11 +606,7 @@ modbus_mapping_t* modbus_mapping_new_start_address(
     }
     else {
         /* Negative number raises a POSIX error */
-        mb_mapping->tab_bits = (uint8_t *)malloc(nb_bits * sizeof(uint8_t));
-        if (mb_mapping->tab_bits == NULL) {
-            free(mb_mapping);
-            return NULL;
-        }
+        mb_mapping->tab_bits = new uint8_t[nb_bits];
         memset(mb_mapping->tab_bits, 0, nb_bits * sizeof(uint8_t));
     }
 
@@ -627,12 +617,7 @@ modbus_mapping_t* modbus_mapping_new_start_address(
         mb_mapping->tab_input_bits = NULL;
     }
     else {
-        mb_mapping->tab_input_bits = (uint8_t *)malloc(nb_input_bits * sizeof(uint8_t));
-        if (mb_mapping->tab_input_bits == NULL) {
-            free(mb_mapping->tab_bits);
-            free(mb_mapping);
-            return NULL;
-        }
+        mb_mapping->tab_input_bits = new uint8_t[nb_input_bits];
         memset(mb_mapping->tab_input_bits, 0, nb_input_bits * sizeof(uint8_t));
     }
 
@@ -643,13 +628,7 @@ modbus_mapping_t* modbus_mapping_new_start_address(
         mb_mapping->tab_registers = NULL;
     }
     else {
-        mb_mapping->tab_registers = (uint16_t *)malloc(nb_registers * sizeof(uint16_t));
-        if (mb_mapping->tab_registers == NULL) {
-            free(mb_mapping->tab_input_bits);
-            free(mb_mapping->tab_bits);
-            free(mb_mapping);
-            return NULL;
-        }
+        mb_mapping->tab_registers = new uint16_t[nb_registers];
         memset(mb_mapping->tab_registers, 0, nb_registers * sizeof(uint16_t));
     }
 
@@ -660,16 +639,8 @@ modbus_mapping_t* modbus_mapping_new_start_address(
         mb_mapping->tab_input_registers = NULL;
     }
     else {
-        mb_mapping->tab_input_registers = (uint16_t *)malloc(nb_input_registers * sizeof(uint16_t));
-        if (mb_mapping->tab_input_registers == NULL) {
-            free(mb_mapping->tab_registers);
-            free(mb_mapping->tab_input_bits);
-            free(mb_mapping->tab_bits);
-            free(mb_mapping);
-            return NULL;
-        }
-        memset(mb_mapping->tab_input_registers, 0,
-            nb_input_registers * sizeof(uint16_t));
+        mb_mapping->tab_input_registers = new uint16_t[nb_input_registers];
+        memset(mb_mapping->tab_input_registers, 0, nb_input_registers * sizeof(uint16_t));
     }
 
     return mb_mapping;
@@ -687,12 +658,11 @@ void modbus_mapping_free(modbus_mapping_t *mb_mapping)
     if (mb_mapping == NULL) {
         return;
     }
-
-    free(mb_mapping->tab_input_registers);
-    free(mb_mapping->tab_registers);
-    free(mb_mapping->tab_input_bits);
-    free(mb_mapping->tab_bits);
-    free(mb_mapping);
+    delete[] mb_mapping->tab_input_registers;
+    delete[] mb_mapping->tab_registers;
+    delete[] mb_mapping->tab_input_bits;
+    delete[] mb_mapping->tab_bits;
+    delete[] mb_mapping;
 }
 
 int modbus_send_raw_request(modbus_t *ctx, uint8_t *raw_req, int raw_req_length)
@@ -780,7 +750,7 @@ int modbus_reply(modbus_t *ctx, const uint8_t *req, int req_length, modbus_mappi
         return -1;
     }
 
-    offset = ctx->backend->header_length;
+    offset = ctx->backend->modbus_header_length();
     slave = req[offset - 1];
     function = req[offset];
     address = (req[offset + 1] << 8) + req[offset + 2];
@@ -1115,7 +1085,7 @@ int modbus_reply_exception(modbus_t *ctx, const uint8_t *req,
         return -1;
     }
 
-    offset = ctx->backend->header_length;
+    offset = ctx->backend->modbus_header_length();
     slave = req[offset - 1];
     function = req[offset];
 
@@ -1365,7 +1335,7 @@ modbus_t* modbus_new_tcp(const char *ip, int port)
     size_t dest_size;
     size_t ret_size;
 
-    ctx = (modbus_t *)malloc(sizeof(modbus_t));
+    ctx = new modbus_t;
     modbus_common::init_common(ctx);    
 
     /* Could be changed after to reach a remote serial Modbus device */
@@ -1373,7 +1343,7 @@ modbus_t* modbus_new_tcp(const char *ip, int port)
 
     ctx->backend = modbus_tcp_backend::GetInstance();
 
-    ctx->backend_data = (modbus_tcp_t *)malloc(sizeof(modbus_tcp_t));
+    ctx->backend_data = new modbus_tcp_t;
     ctx_tcp = (modbus_tcp_t *)ctx->backend_data;
 
     if (ip != NULL) {
@@ -1410,7 +1380,7 @@ modbus_t* modbus_new_tcp_pi(const char *node, const char *service)
     size_t dest_size;
     size_t ret_size;
 
-    ctx = (modbus_t *)malloc(sizeof(modbus_t));
+    ctx = new modbus_t;
     modbus_common::init_common(ctx);
 
     /* Could be changed after to reach a remote serial Modbus device */
@@ -1418,7 +1388,7 @@ modbus_t* modbus_new_tcp_pi(const char *node, const char *service)
 
     ctx->backend = modbus_tcpPI_backend::GetInstance();
 
-    ctx->backend_data = (modbus_tcp_pi_t *)malloc(sizeof(modbus_tcp_pi_t));
+    ctx->backend_data = new modbus_tcp_pi_t;
     ctx_tcp_pi = (modbus_tcp_pi_t *)ctx->backend_data;
 
     if (node == NULL) {
@@ -1478,7 +1448,7 @@ int modbus_rtu_set_serial_mode(modbus_t *ctx, int mode)
         return -1;
     }
 
-    if (ctx->backend->backend_type == _MODBUS_BACKEND_TYPE_RTU) {
+    if (ctx->backend->modbus_backend_type() == _MODBUS_BACKEND_TYPE_RTU) {
         if (ctx->debug) {
             fprintf(stderr, "This function isn't supported on your platform\n");
         }
@@ -1498,7 +1468,7 @@ int modbus_rtu_get_serial_mode(modbus_t *ctx)
         return -1;
     }
 
-    if (ctx->backend->backend_type == _MODBUS_BACKEND_TYPE_RTU) {
+    if (ctx->backend->modbus_backend_type() == _MODBUS_BACKEND_TYPE_RTU) {
         if (ctx->debug) {
             fprintf(stderr, "This function isn't supported on your platform\n");
         }
@@ -1518,7 +1488,7 @@ int modbus_rtu_get_rts(modbus_t *ctx)
         return -1;
     }
 
-    if (ctx->backend->backend_type == _MODBUS_BACKEND_TYPE_RTU) {
+    if (ctx->backend->modbus_backend_type() == _MODBUS_BACKEND_TYPE_RTU) {
         if (ctx->debug) {
             fprintf(stderr, "This function isn't supported on your platform\n");
         }
@@ -1538,7 +1508,7 @@ int modbus_rtu_set_rts(modbus_t *ctx, int mode)
         return -1;
     }
 
-    if (ctx->backend->backend_type == _MODBUS_BACKEND_TYPE_RTU) {
+    if (ctx->backend->modbus_backend_type() == _MODBUS_BACKEND_TYPE_RTU) {
         if (ctx->debug) {
             fprintf(stderr, "This function isn't supported on your platform\n");
         }
@@ -1557,7 +1527,7 @@ int modbus_rtu_set_custom_rts(modbus_t *ctx, void(*set_rts) (modbus_t *ctx, int 
         return -1;
     }
 
-    if (ctx->backend->backend_type == _MODBUS_BACKEND_TYPE_RTU) {
+    if (ctx->backend->modbus_backend_type() == _MODBUS_BACKEND_TYPE_RTU) {
         if (ctx->debug) {
             fprintf(stderr, "This function isn't supported on your platform\n");
         }
@@ -1577,7 +1547,7 @@ int modbus_rtu_get_rts_delay(modbus_t *ctx)
         return -1;
     }
 
-    if (ctx->backend->backend_type == _MODBUS_BACKEND_TYPE_RTU) {
+    if (ctx->backend->modbus_backend_type() == _MODBUS_BACKEND_TYPE_RTU) {
         if (ctx->debug) {
             fprintf(stderr, "This function isn't supported on your platform\n");
         }
@@ -1597,7 +1567,7 @@ int modbus_rtu_set_rts_delay(modbus_t *ctx, int us)
         return -1;
     }
 
-    if (ctx->backend->backend_type == _MODBUS_BACKEND_TYPE_RTU) {
+    if (ctx->backend->modbus_backend_type() == _MODBUS_BACKEND_TYPE_RTU) {
         if (ctx->debug) {
             fprintf(stderr, "This function isn't supported on your platform\n");
         }
@@ -1614,8 +1584,8 @@ modbus_t* modbus_new_rtu(const char *device,
     int baud, char parity, int data_bit,
     int stop_bit)
 {
-    modbus_t *ctx;
-    modbus_rtu_t *ctx_rtu;
+    modbus_t *ctx = NULL;
+    modbus_rtu_t *ctx_rtu = NULL;
 
     /* Check device argument */
     if (device == NULL || *device == 0) {
@@ -1631,15 +1601,15 @@ modbus_t* modbus_new_rtu(const char *device,
         return NULL;
     }
 
-    ctx = (modbus_t *)malloc(sizeof(modbus_t));
+    ctx = new modbus_t;
     modbus_common::init_common(ctx);
     ctx->backend = modbus_rtu_backend::GetInstance();
-    ctx->backend_data = (modbus_rtu_t *)malloc(sizeof(modbus_rtu_t));
+    ctx->backend_data = new modbus_rtu_t;
     ctx_rtu = (modbus_rtu_t *)ctx->backend_data;
     ctx_rtu->device = NULL;
 
     /* Device name and \0 */
-    ctx_rtu->device = (char *)malloc((strlen(device) + 1) * sizeof(char));
+    ctx_rtu->device = new char[strlen(device) + 1];
     strcpy_s(ctx_rtu->device, strlen(device), device);
 
     ctx_rtu->baud = baud;

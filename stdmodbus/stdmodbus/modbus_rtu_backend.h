@@ -26,6 +26,10 @@ public:
     int win32_ser_read(struct win32_ser *ws, uint8_t *p_msg, unsigned int max_len);
 
 public:
+    virtual unsigned int modbus_backend_type();
+    virtual unsigned int modbus_header_length();
+    virtual unsigned int modbus_checksum_length();
+    virtual unsigned int modbus_max_adu_length();
     virtual int modbus_set_slave(modbus_t*ctx, int slave);
     virtual int modbus_build_request_basis(modbus_t *ctx, int function, int addr, int nb, uint8_t *req);
     virtual int modbus_build_response_basis(sft_t *sft, uint8_t *rsp);

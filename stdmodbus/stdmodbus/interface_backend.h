@@ -60,6 +60,10 @@ public:
 
     }
 public:
+    virtual unsigned int modbus_backend_type() = 0;
+    virtual unsigned int modbus_header_length() = 0;
+    virtual unsigned int modbus_checksum_length() = 0;
+    virtual unsigned int modbus_max_adu_length() = 0;
     virtual int modbus_set_slave(modbus_t*ctx, int slave) = 0;
     virtual int modbus_build_request_basis(modbus_t *ctx, int function, int addr, int nb, uint8_t *req) = 0;
     virtual int modbus_build_response_basis(sft_t *sft, uint8_t *rsp) = 0;
@@ -76,7 +80,7 @@ public:
     virtual int modbus_select(modbus_t *ctx, fd_set *rset, struct timeval *tv, int length) = 0;
     virtual void modbus_free(modbus_t *ctx) = 0;
 
-public:
+protected:
     unsigned int backend_type;
     unsigned int header_length;
     unsigned int checksum_length;

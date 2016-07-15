@@ -111,7 +111,7 @@ int modbus_common::receive_msg(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type,
     * to reach the function code because all packets contain this
     * information. */
     step = _STEP_FUNCTION;
-    length_to_read = pbackend->header_length + 1;
+    length_to_read = pbackend->modbus_header_length() + 1;
 
     if (msg_type == MSG_INDICATION) {
         /* Wait for a message, we don't know when the message will be
@@ -182,7 +182,7 @@ int modbus_common::receive_msg(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type,
             case _STEP_FUNCTION:
                 /* Function code position */
                 length_to_read = compute_meta_length_after_function(
-                    msg[pbackend->header_length],
+                    msg[pbackend->modbus_header_length()],
                     msg_type);
                 if (length_to_read != 0) {
                     step = _STEP_META;
@@ -190,7 +190,7 @@ int modbus_common::receive_msg(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type,
                 } /* else switches straight to the next step */
             case _STEP_META:
                 length_to_read = compute_data_length_after_meta(ctx, msg, msg_type, pbackend);
-                if ((msg_length + length_to_read) > (int)pbackend->max_adu_length) {
+                if ((msg_length + length_to_read) > (int)pbackend->modbus_max_adu_length()) {
                     errno = EMBBADDATA;
                     error_print(ctx, "too many data");
                     return -1;
@@ -246,7 +246,7 @@ int modbus_common::read_io_status(modbus_t *ctx, int function, int addr, int nb,
         if (rc == -1)
             return -1;
 
-        offset = pbackend->header_length + 2;
+        offset = pbackend->modbus_header_length() + 2;
         offset_end = offset + rc;
         for (i = offset; i < offset_end; i++) {
             /* Shift reg hi_byte to temp */
@@ -267,7 +267,7 @@ int modbus_common::check_confirmation(modbus_t *ctx, uint8_t *req, uint8_t *rsp,
 {
     int rc;
     int rsp_length_computed;
-    const int offset = pbackend->header_length;
+    const int offset = pbackend->modbus_header_length();
     const int function = rsp[offset];
 
     if (pbackend) {
@@ -285,7 +285,7 @@ int modbus_common::check_confirmation(modbus_t *ctx, uint8_t *req, uint8_t *rsp,
 
     /* Exception code */
     if (function >= 0x80) {
-        if (rsp_length == (offset + 2 + (int)pbackend->checksum_length) &&
+        if (rsp_length == (offset + 2 + (int)pbackend->modbus_checksum_length()) &&
             req[offset] == (rsp[offset] - 0x80)) {
             /* Valid exception code received */
 
@@ -494,17 +494,17 @@ uint8_t modbus_common::compute_meta_length_after_function(int function, msg_type
 /* Computes the length to read after the meta information (address, count, etc) */
 int modbus_common::compute_data_length_after_meta(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type, interface_backend *pbackend)
 {
-    int function = msg[pbackend->header_length];
+    int function = msg[pbackend->modbus_header_length()];
     int length;
 
     if (msg_type == MSG_INDICATION) {
         switch (function) {
         case MODBUS_FC_WRITE_MULTIPLE_COILS:
         case MODBUS_FC_WRITE_MULTIPLE_REGISTERS:
-            length = msg[pbackend->header_length + 5];
+            length = msg[pbackend->modbus_header_length() + 5];
             break;
         case MODBUS_FC_WRITE_AND_READ_REGISTERS:
-            length = msg[pbackend->header_length + 9];
+            length = msg[pbackend->modbus_header_length() + 9];
             break;
         default:
             length = 0;
@@ -515,14 +515,14 @@ int modbus_common::compute_data_length_after_meta(modbus_t *ctx, uint8_t *msg, m
         if (function <= MODBUS_FC_READ_INPUT_REGISTERS ||
             function == MODBUS_FC_REPORT_SLAVE_ID ||
             function == MODBUS_FC_WRITE_AND_READ_REGISTERS) {
-            length = msg[pbackend->header_length + 1];
+            length = msg[pbackend->modbus_header_length() + 1];
         }
         else {
             length = 0;
         }
     }
 
-    length += pbackend->checksum_length;
+    length += pbackend->modbus_checksum_length();
 
     return length;
 }
@@ -686,7 +686,7 @@ int modbus_common::read_registers(modbus_t *ctx, int function, int addr, int nb,
         if (rc == -1)
             return -1;
 
-        offset = pbackend->header_length;
+        offset = pbackend->modbus_header_length();
 
         for (i = 0; i < rc; i++) {
             /* shift reg hi_byte to temp OR with lo_byte */
@@ -702,7 +702,7 @@ int modbus_common::read_registers(modbus_t *ctx, int function, int addr, int nb,
 unsigned int modbus_common::compute_response_length_from_request(modbus_t *ctx, uint8_t *req, interface_backend *pbackend)
 {
     int length;
-    const int offset = pbackend->header_length;
+    const int offset = pbackend->modbus_header_length();
 
     switch (req[offset]) {
     case MODBUS_FC_READ_COILS:
@@ -732,7 +732,7 @@ unsigned int modbus_common::compute_response_length_from_request(modbus_t *ctx, 
         length = 5;
     }
 
-    return offset + length + pbackend->checksum_length;
+    return offset + length + pbackend->modbus_checksum_length();
 }
 
 int modbus_common::response_io_status(uint8_t *tab_io_status, int address, int nb, uint8_t *rsp, int offset)
