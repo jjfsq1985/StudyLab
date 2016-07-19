@@ -1,3 +1,1 @@
-//qt creater
-//this file is empty
-//
+#include  <stdio.h>

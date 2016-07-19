@@ -10,6 +10,8 @@ CHN_NAME_VALUE chnValuePair[] =
     { "万", 10000, true }, { "亿", 100000000, true }
 };
 
+const std::string chnRepeat = "亿";
+
 ChineseToNum::ChineseToNum()
 {
 }
@@ -48,10 +50,19 @@ int ChineseToNum::ChineseToUnit(const std::string& chnUnit, bool&  secUnit)
     return nRet;
 }
 
-unsigned int ChineseToNum::ChnStrToNum(const std::string& chnString)
+bool ChineseToNum::IsRepeat(const std::string& strSection)
 {
-    unsigned int rtn = 0;
-    unsigned int section = 0;
+    if(strSection == chnRepeat)
+    {
+        return true;
+    }
+    return false;
+}
+
+long long ChineseToNum::ChnStrToNum(const std::string& chnString)
+{
+    long long rtn = 0;
+    long long section = 0;
     int number = 0;
     bool secUnit = false;
     std::string::size_type pos = 0;
@@ -72,7 +83,8 @@ unsigned int ChineseToNum::ChnStrToNum(const std::string& chnString)
         else
         {
             int unit = ChineseToUnit(chnString.substr(pos, CHN_CHAR_LENGTH), secUnit);
-            if (secUnit)//是节权位说明一个节已经结束
+            //是节权位并且不是"万亿""亿亿"，则说明一个节已经结束
+            if (secUnit && !IsRepeat(chnString.substr(pos+CHN_CHAR_LENGTH, CHN_CHAR_LENGTH)))
             {
                 section = (section + number) * unit;
                 rtn += section;
