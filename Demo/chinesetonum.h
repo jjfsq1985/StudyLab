@@ -2,7 +2,7 @@
 #define CHINESETONUM_H
 #include <string>
 
-typedef struct  
+typedef struct
 {
     const char* name; //中文权位名称
     int value;//10的倍数值
@@ -18,9 +18,10 @@ public:
     ~ChineseToNum();
 
 public:
-    unsigned int ChnStrToNum(const std::string& chnString);
+    long long ChnStrToNum(const std::string& chnString);
 
 private:
+    bool IsRepeat(const std::string& strSection);
     int ChineseToValue(const std::string& chnString);
     int ChineseToUnit(const std::string& chnUnit, bool&  secUnit);
 };

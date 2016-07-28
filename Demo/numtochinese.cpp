@@ -13,7 +13,7 @@ NumToChinese::~NumToChinese()
 }
 
 
-void NumToChinese::NumberToChnStr(unsigned int num, std::string& chnStr)
+void NumToChinese::NumberToChnStr(long long num, std::string& chnStr)
 {
   chnStr = "";
   int unitPos = 0;

@@ -1,0 +1,29 @@
+# depslib dependency file v1.0
+1468933842 source:e:\sample\studylab\demo\chinesetonum.cpp
+	"stdafx.h"
+	"DefineNum.h"
+	"chinesetonum.h"
+
+1468927525 e:\sample\studylab\demo\stdafx.h
+	<stdio.h>
+
+1468930989 e:\sample\studylab\demo\definenum.h
+	<string>
+
+1468933794 e:\sample\studylab\demo\chinesetonum.h
+	<string>
+
+1468930921 source:e:\sample\studylab\demo\numtochinese.cpp
+	"stdafx.h"
+	"DefineNum.h"
+	"numtochinese.h"
+
+1468930903 e:\sample\studylab\demo\numtochinese.h
+	<string>
+
+1468931760 source:e:\sample\studylab\demo\main.cpp
+	"stdafx.h"
+	"numtochinese.h"
+	"chinesetonum.h"
+	<string>
+

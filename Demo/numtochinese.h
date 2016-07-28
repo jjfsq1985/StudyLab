@@ -9,7 +9,7 @@ public:
     ~NumToChinese();
 
 public:
-    void NumberToChnStr(unsigned int num, std::string& chnStr);
+    void NumberToChnStr(long long num, std::string& chnStr);
 
 private:
     void SectionToChinese(unsigned int section, std::string& chnStr);
