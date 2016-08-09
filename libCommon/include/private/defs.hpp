@@ -6,7 +6,7 @@
 		#error You need to use a C++11 compiler, such as Visual Studio 2013 or higher.
 	#endif
 #else
-	#if defined(__cplusplus) && (__cplusplus < 201300) // For some reason GCC 4.9 thinks the correct value is 2013000 :(
+	#if defined(__cplusplus) && (__cplusplus < 201103)
 		#error You need to use a C++11 compiler. Try passing -std=c++11 as compiler flag.
 	#endif
 #endif

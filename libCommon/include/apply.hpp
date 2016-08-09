@@ -41,7 +41,7 @@ auto apply_(F&& f, Tuple&& t, index_sequence<I...> const&) -> decltype(std::forw
  * // v is now 11
  * \endcode
  */
-template<typename F, typename Tuple, typename Seq = typename make_index_sequence<std::tuple_size<typename std::remove_reference<Tuple>::type>::value>>
+template<typename F, typename Tuple, typename Seq = make_index_sequence<std::tuple_size<typename std::remove_reference<Tuple>::type>::value>>
 auto apply(F && f, Tuple&& args) -> decltype(apply_(std::forward<F>(f), std::forward<Tuple>(args), Seq()))
 {
 	return apply_(std::forward<F>(f), std::forward<Tuple>(args), Seq());
@@ -75,7 +75,7 @@ auto apply_(Obj&& obj, F&& f, Tuple&& t, index_sequence<I...> const&) -> decltyp
  * // v is now 11
  * \endcode
  */
-template<typename Obj, typename F, typename Tuple, typename Seq = typename make_index_sequence<std::tuple_size<typename std::remove_reference<Tuple>::type>::value>>
+template<typename Obj, typename F, typename Tuple, typename Seq = make_index_sequence<std::tuple_size<typename std::remove_reference<Tuple>::type>::value>>
 auto apply(Obj&& obj, F && f, Tuple&& args) -> decltype(apply_(std::forward<Obj>(obj), std::forward<F>(f), std::forward<Tuple>(args), Seq()))
 {
 	return apply_(std::forward<Obj>(obj), std::forward<F>(f), std::forward<Tuple>(args), Seq());

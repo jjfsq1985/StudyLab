@@ -1,0 +1,11 @@
+The 199711L stands for Year=1997, Month = 11 (i.e., November of 1997) -- the date when the committee approved the standard that the rest of the ISO approved in early 1998.
+
+For the 2003 standard, there were few enough changes that the committee (apparently) decided to leave that value unchanged.
+
+For the 2011 standard, it's required to be defined as 201103L, (again, year=2011, month = 03) again meaning that the committee approved the standard as finalized in March of 2011.
+
+For the 2014 standard, it's required to be defined as 201402L, interpreted the same way as above (February 2014).
+
+Before the original standard was approved, quite a few compilers normally defined it to 0 (or just an empty definition like #define __cplusplus) to signify "not-conforming". When asked for their strictest conformance, many defined it to 1.
+
+I almost forgot to mention, but one more tidbit about ancient compilers: a few of the earliest versions of cfront (and probably a few others copying it) defined c_plusplus instead of __cplusplus. I don't recall it's being defined to any meaningful value though.
