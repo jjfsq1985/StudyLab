@@ -1,12 +1,12 @@
 ####### Compiler, tools and options
 
-CC            = gcc
-CXX           = g++
+CC            = gcc494
+CXX           = g++494
 DEFINES       = -DBUILDING_LIBCOMMON -DLIB_UNIX 
 CFLAGS        = -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -std=c++11 -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I../libCommon -I/usr/include -I. -I../libCommon -I.
-LINK          = g++
+LINK          = g++494
 LFLAGS        = -Wl,-O1 -Wl,-z,relro -shared -Wl,-soname,liblibCommon.so.1
 LIBS          = $(SUBLIBS)  -L/usr/lib -lpthread 
 AR            = ar cqs
