@@ -1,0 +1,27 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RServer", "RServer.csproj", "{71289603-B5B2-4018-8865-E7795192BF87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemotableObjects", "..\RemotableObjects\RemotableObjects.csproj", "{8344AD05-4EEC-4710-8EE0-BE8187ED4091}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{71289603-B5B2-4018-8865-E7795192BF87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71289603-B5B2-4018-8865-E7795192BF87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71289603-B5B2-4018-8865-E7795192BF87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71289603-B5B2-4018-8865-E7795192BF87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8344AD05-4EEC-4710-8EE0-BE8187ED4091}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8344AD05-4EEC-4710-8EE0-BE8187ED4091}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8344AD05-4EEC-4710-8EE0-BE8187ED4091}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8344AD05-4EEC-4710-8EE0-BE8187ED4091}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
