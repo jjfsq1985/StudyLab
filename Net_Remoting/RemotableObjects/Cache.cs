@@ -17,6 +17,7 @@ namespace RemotableObjects
 		{
 			Observer = observer;
 		}
+
 		public static Cache GetInstance()
 		{
 			if(myInstance==null)
@@ -32,5 +33,6 @@ namespace RemotableObjects
 				Observer.Notify(value);
 			}
 		}
+
 	}
 }
