@@ -38,7 +38,7 @@ namespace RemotableObjects
             serverProv.TypeFilterLevel = System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
             BinaryClientFormatterSinkProvider clientProv = new BinaryClientFormatterSinkProvider();
             IDictionary props = new Hashtable();
-            props["port"] = 8081;//接收port
+            props["port"] = 0;//接收端口(随机)
             TcpChannel chan = new TcpChannel(props, clientProv, serverProv);
 
 			ChannelServices.RegisterChannel(chan,false);

@@ -37,11 +37,25 @@ namespace RemotableObjects
         public void PutCmd(string command)
         {
             if (ServerEvent != null)
-                ServerEvent(command);
+            {
+                ServerEventHandler tempEvent = null;
+                foreach (Delegate dele in ServerEvent.GetInvocationList())
+                {
+                    try
+                    {
+                        tempEvent = (ServerEventHandler)dele;
+                        tempEvent(command);
+                    }
+                    catch
+                    {
+                        ServerEvent -= tempEvent;
+                    }
+                }
+            }
         }
-        public override object InitializeLifetimeService()
-        {
-            return null;
-        }
+         public override object InitializeLifetimeService()
+ {
+  return null;
+ }
 	}
 }
