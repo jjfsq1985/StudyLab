@@ -39,7 +39,7 @@ public:
 
 protected:
     wstring CharToWStr(const char *Data);
-    void UpdateFileName(const string& fileName);
+    void UpdateFileName(const HTuple& hWnd, const string& fileName);
     void EnumImageFile();
     void HImage2CBitmap(const HObject& pImage, CBitmap *wImage);
     HObject mirrImg;//摄像头采集图，为了可以保存，设为成员变量
@@ -57,15 +57,17 @@ protected:
     {
         CMVCamDlg *pParent;
         HANDLE hResetThreadEvent;
+        HTuple hWind;
     }ThreadPar;
 
     vector<string> m_vecAllFile;
+    string m_filenameMutex;
     bool m_bPause;
     HANDLE m_FileMutex;//读文件互斥
 
     HANDLE m_DispMutex;//显示在同一窗口互斥
 
-    void DealImage(const HObject& ImageSrc);
+    void DealImage(const HObject& ImageSrc, const HTuple& hWnd);
     void SetWindowParam(const HTuple& hWnd, const HTuple& Width, const HTuple& Height);
 
     volatile bool m_bRun;

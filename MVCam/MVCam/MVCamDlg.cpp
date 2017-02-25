@@ -1,5 +1,4 @@
-﻿
-// MVCamDlg.cpp : 实现文件
+﻿// MVCamDlg.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -8,6 +7,7 @@
 #include "afxdialogex.h"
 #include "atlimage.h"
 #include <io.h>
+#include "HException.h"
 
 #define  WM_FILENAME_MESSAGE  (WM_USER + 1)
 
@@ -110,7 +110,8 @@ BOOL CMVCamDlg::OnInitDialog()
     SetIcon(m_hIcon, TRUE);			// 设置大图标
     SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-    GetDlgItem(IDC_FILE_NAME)->SetWindowText(L"");
+    GetDlgItem(IDC_FILE_LEFT)->SetWindowText(L"");
+    GetDlgItem(IDC_FILE_RIGHT)->SetWindowText(L"");
 
 
     return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -234,12 +235,14 @@ void CMVCamDlg::OnBnClickedButton1()
     ThreadPar *ActionPar = new ThreadPar();
     ActionPar->pParent = this;
     ActionPar->hResetThreadEvent = hEvent1;
-    m_hSyncThread = CreateThread(NULL, 64*1024, (LPTHREAD_START_ROUTINE)&ImageAction, ActionPar, 0, &m_threadIdSync);
+    ActionPar->hWind = hWindowHandle;
+    m_hSyncThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&ImageAction, ActionPar, 0, &m_threadIdSync);
     m_threadIdSobel = 0;
     ThreadPar *ActionSobelPar = new ThreadPar();
     ActionSobelPar->pParent = this;
     ActionSobelPar->hResetThreadEvent = hEvent2;
-    m_hSobelThread = CreateThread(NULL, 64 * 1024, (LPTHREAD_START_ROUTINE)&ImageAction, ActionSobelPar, 0, &m_threadIdSobel);
+    ActionSobelPar->hWind = hWndImg;
+    m_hSobelThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&ImageAction, ActionSobelPar, 0, &m_threadIdSobel);
 
     m_bMonitor = true;
     DWORD dwID;
@@ -270,8 +273,9 @@ UINT CMVCamDlg::ImageAction(LPVOID pParam)
     ThreadPar *pPar = (ThreadPar*)pParam;
     bool bNeedReset = false;
     CMVCamDlg *pdlg = pPar->pParent;
-    HObject SobelAmpImg;
-    int i = 0;
+    int nCount = pdlg->m_vecAllFile.size();
+    srand(GetCurrentThreadId());
+    int i = rand()%nCount;
     MSG msg; 
     while (pdlg->m_bRun)
     {
@@ -286,27 +290,38 @@ UINT CMVCamDlg::ImageAction(LPVOID pParam)
             //pdlg->ResetThread(GetCurrentThread(),GetCurrentThreadId());
             break;
         }
-        if (WaitForSingleObject(pdlg->m_FileMutex, 5000) == WAIT_OBJECT_0)
-        {
-            string strFileName = pdlg->m_vecAllFile[i];
-            //DWORD dwStart = GetTickCount();
-            ReadImage(&SobelAmpImg, strFileName.c_str());
-            //DWORD dwTime = GetTickCount() - dwStart;
-            //TRACE(L"------------------------线程 %d ReadImage 耗时 %dms\r\n", GetCurrentThreadId(), dwTime);
-            pdlg->UpdateFileName(strFileName);
-            ReleaseMutex(pdlg->m_FileMutex);
-        }
-        else
-        {
-            continue;//未获取到互斥量，下次还是读该文件
-        }
+       string strFileName = pdlg->m_vecAllFile[i];
+       HObject ImgGraph;//读一次销毁一次
+       if (strFileName == pdlg->m_filenameMutex)
+       {
+           if (WaitForSingleObject(pdlg->m_FileMutex, 3000) == WAIT_OBJECT_0)
+           {
+               ReadImage(&ImgGraph, strFileName.c_str());
+               string strTrace = strFileName + "\r\n";
+               TRACE(strTrace.c_str());
+               pdlg->UpdateFileName(pPar->hWind,strFileName);
+               ReleaseMutex(pdlg->m_FileMutex);
+           }
+           else
+           {
+               continue;//未获取到互斥量，下次还是读该文件
+           }
+       }
+       else
+       {
+           pdlg->m_filenameMutex = strFileName;
+           ReadImage(&ImgGraph, strFileName.c_str());
+           string strTrace = "无锁读取" + strFileName + "\r\n";
+           TRACE(strTrace.c_str());
+           pdlg->UpdateFileName(pPar->hWind,strFileName);
+       }
         i++;
-        if (i >= pdlg->m_vecAllFile.size())
+        if (i >= nCount)
         {
             bNeedReset = true;
             i = 0;
         }            
-        pdlg->DealImage(SobelAmpImg);
+        pdlg->DealImage(ImgGraph, pPar->hWind);
 
         //必须处理消息，否则主线程失去响应
         if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -320,14 +335,14 @@ UINT CMVCamDlg::ImageAction(LPVOID pParam)
     return 5;
 }
 
-void CMVCamDlg::UpdateFileName(const string& fileName)
+void CMVCamDlg::UpdateFileName(const HTuple& hWnd, const string& fileName)
 {
     int nLen = fileName.length();
     CHAR* msgStr = new CHAR[nLen+1];
     strncpy_s(msgStr, nLen+1, fileName.c_str(), nLen);
     msgStr[nLen] = 0;
     if (m_bRun)
-        PostMessage(WM_FILENAME_MESSAGE, 0, (LPARAM)msgStr);
+        PostMessage(WM_FILENAME_MESSAGE, (WPARAM)hWnd.L(), (LPARAM)msgStr);
     else
         delete[] msgStr;
 }
@@ -339,7 +354,10 @@ LRESULT CMVCamDlg::OnFileNameMsg(WPARAM wParam, LPARAM lParam)
     delete lpFileName;
     string strText = strFileName.substr(strFileName.find_last_of('\\') + 1);
     wstring strWText = CharToWStr(strText.c_str());
-    GetDlgItem(IDC_FILE_NAME)->SetWindowText(strWText.c_str());
+    if ((Hlong)wParam == hWindowHandle.L())
+        GetDlgItem(IDC_FILE_LEFT)->SetWindowText(strWText.c_str());
+    else if ((Hlong)wParam == hWndImg.L())
+        GetDlgItem(IDC_FILE_RIGHT)->SetWindowText(strWText.c_str());
     return 0;
 }
 
@@ -505,26 +523,38 @@ void CMVCamDlg::OnDestroy()
     CDialogEx::OnDestroy();
 }
 
-void CMVCamDlg::DealImage(const HObject& ImageSrc)
+void CMVCamDlg::DealImage(const HObject& ImageSrc, const HTuple& hWnd)
 {
-    HObject Amp;
-    //DWORD dwStart = GetTickCount();
-    SobelAmp(ImageSrc, &Amp, "sum_sqrt", 7);
+    HObject Regions;
+    HObject EdgRegion;
+    GenEmptyObj(&Regions);
+    GenEmptyObj(&EdgRegion);
+
+    HObject Amplitude;
+    HObject Mean;
+    SobelAmp(ImageSrc, &Amplitude, "sum_sqrt", 7);
+    MeanImage(ImageSrc, &Mean, 31, 31);
+    DynThreshold(ImageSrc, Mean, &EdgRegion, 10, "dark");
+    Connection(EdgRegion, &Regions);
     if (m_bPause)
         return;
-    //DWORD dwTime = GetTickCount() - dwStart;
-    //TRACE(L"线程 %d SobelAmp 耗时 %dms\r\n", GetCurrentThreadId(), dwTime);
-    //bin_threshold(Amp, &Edg);
-    //disp_region(Edg, WindowsHandle);
-    //disp_image(Amp, c);
-    //edges_sub_pix(Image, &Edg, "lanser2", 1.0, 10, 70);//边缘
-    //measure_pos(Image, MeasureHandle, Sigma, Threshold, Transition, Select, \
-     //   RowEdge, ColumnEdge, Amplitude, Distance)
-    if (WaitForSingleObject(m_DispMutex, 1000) == WAIT_OBJECT_0)
+    //bin_threshold(SobelImg, &Edg);
+    //disp_region(EdgRegion, WindowsHandle);
+    //disp_image(SobelImg, c);
+    //edges_sub_pix(ImageSrc, &EdgRegion, "lanser2", 1.0, 10, 70);//边缘
+    //measure_pos(ImageSrc, MeasureHandle, Sigma, Threshold, Transition, Select, \
+            //   RowEdge, ColumnEdge, Amplitude, Distance);
+    //if (WaitForSingleObject(m_DispMutex, 2000) == WAIT_OBJECT_0)
     {
-        DispImage(ImageSrc, hWindowHandle);
-        DispObj(Amp, hWndImg);
-        ReleaseMutex(m_DispMutex);
+        DWORD dwStart = GetTickCount();
+        //DispObj(Regions, hWindowHandle);//耗时1.6~1.8秒
+        DispObj(ImageSrc, hWnd);
+        //DispObj(EdgRegion, hWnd);
+        //DispObj(Amplitude, hWndImg);
+        DispObj(Regions, hWnd);
+        DWORD dwTime = GetTickCount() - dwStart;
+        TRACE(L"线程 %d Display 耗时 %dms\r\n", GetCurrentThreadId(), dwTime);
+        //ReleaseMutex(m_DispMutex);
     }
 }
 
@@ -550,6 +580,7 @@ UINT CMVCamDlg::MonitorThread(LPVOID pParam)
             ThreadPar *ActionPar = new ThreadPar();
             ActionPar->pParent = pDlg;
             ActionPar->hResetThreadEvent = pMonitorPar->hEventSync;
+            ActionPar->hWind = pDlg->hWindowHandle;
             pDlg->m_hSyncThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&ImageAction, ActionPar, 0, &(pDlg->m_threadIdSync));
             ResetEvent(pMonitorPar->hEventSync);
         }
@@ -564,6 +595,7 @@ UINT CMVCamDlg::MonitorThread(LPVOID pParam)
             ThreadPar *ActionSobelPar = new ThreadPar();
             ActionSobelPar->pParent = pDlg;
             ActionSobelPar->hResetThreadEvent = pMonitorPar->hEventSobel;
+            ActionSobelPar->hWind = pDlg->hWndImg;
             pDlg->m_hSobelThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&ImageAction, ActionSobelPar, 0, &(pDlg->m_threadIdSobel));
             ResetEvent(pMonitorPar->hEventSobel);
         }
@@ -609,11 +641,17 @@ void CMVCamDlg::OnBnClickedButton3()
     m_bPause = true;
     HANDLE hThreadWait[2] = { m_hSyncThread, m_hSobelThread };
     DWORD dwWait = WaitForMultipleObjects(2, hThreadWait, TRUE, INFINITE);
+	m_hSyncThread = INVALID_HANDLE_VALUE;
+	m_hSobelThread = INVALID_HANDLE_VALUE;
 
     m_bMonitor = false;
     WaitForSingleObject(m_hMonitorthrad, INFINITE);
+	m_hMonitorthrad = INVALID_HANDLE_VALUE;
 
     CloseHandle(m_FileMutex);
     CloseHandle(m_DispMutex);
     TRACE(L"All Custom Thread Quit\r\n");
+
+    HalconCpp::CloseWindow(hWindowHandle);
+    HalconCpp::CloseWindow(hWndImg);
 }
