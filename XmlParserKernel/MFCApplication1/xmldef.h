@@ -18,6 +18,8 @@
 
 XMLPARSER_BEGIN_DECLS
 
+const int MAX_XML_STR_LEN = 1024;
+
 typedef class xmlNode* xmlNode_t;
 
 typedef class xmlAttr* xmlAttr_t;

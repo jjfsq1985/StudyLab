@@ -8,11 +8,15 @@ using namespace std;
 
 XmlUtils::XmlUtils()
 {
+	m_xmlfile = NULL;
 }
 
 
 XmlUtils::~XmlUtils()
 {
+	if (m_xmlfile != NULL)
+		delete m_xmlfile;
+	m_xmlfile = NULL;
 }
 
 
@@ -22,7 +26,7 @@ void XmlUtils::AppendHead()
 	m_doc.append_node(rot);
 }
 
-xmlNode* XmlUtils::RootNode(char* cRoot)
+xmlNode* XmlUtils::WriteRootNode(char* cRoot)
 {
 	if (cRoot == NULL || strlen(cRoot) == 0)
 		return NULL;
@@ -42,7 +46,6 @@ bool XmlUtils::WriteXml(char* cPath)
 	ofs << m_doc;
 	return true;
 }
-
 
 void XmlUtils::AppendNode(xmlNode* parent, xmlNode* node)
 {
@@ -73,4 +76,21 @@ void XmlUtils::AppendAttrib(xmlNode* node, xmlAttr* attr)
 	if (node == NULL || attr == NULL)
 		return;
 	node->append_attribute(attr);
+}
+
+xmlNode* XmlUtils::ReadXml(char* cPath)
+{
+	m_xmlfile = new rapidxml::file<char>(cPath);
+	m_doc.parse<0>(m_xmlfile->data());
+	return (xmlNode*)m_doc.first_node();
+}
+
+
+bool XmlUtils:: ReadRootNode(xmlNode* rootNode, char* sName)
+{
+	if (rootNode == NULL)
+		return false;
+	char* cName = rootNode->name();
+	strcpy_s(sName, strlen(cName)+1, cName);
+	return true;
 }

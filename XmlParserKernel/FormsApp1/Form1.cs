@@ -20,7 +20,7 @@ namespace FormsApp1
         private void btnWrite_Click(object sender, EventArgs e)
         {
             XmlUtils.InitUtil();
-            IntPtr root = XmlUtils.XmlRoot(Encoding.UTF8.GetBytes("ArrayOfPrimParBase"));
+            IntPtr root = XmlUtils.WriteXmlRoot(Encoding.UTF8.GetBytes("ArrayOfPrimParBase"));
             IntPtr attr1 = XmlUtils.AllocAttr(Encoding.UTF8.GetBytes("xmlns:xsd"), Encoding.UTF8.GetBytes("http://www.w3.org/2001/XMLSchema"));
             IntPtr attr2 = XmlUtils.AllocAttr(Encoding.UTF8.GetBytes("xmlns:xsi"), Encoding.UTF8.GetBytes("http://www.w3.org/2001/XMLSchema-instance"));
             XmlUtils.AppendAttr(root, attr1);

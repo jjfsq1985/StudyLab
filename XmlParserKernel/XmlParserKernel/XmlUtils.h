@@ -12,7 +12,7 @@ public:
 
 public:
 	void AppendHead();
-	xmlNode* RootNode(char *cRoot);
+	xmlNode* WriteRootNode(char *cRoot);
 
 	bool WriteXml(char* cPath);
 
@@ -24,8 +24,12 @@ public:
 
 	void AppendAttrib(xmlNode* node, xmlAttr* attr);
 
+public:
+	xmlNode* ReadXml(char* cPath);
+	bool ReadRootNode(xmlNode* rootNode, char* sName);
 
 private:
+	rapidxml::file<char>* m_xmlfile;
 	xml_document<char> m_doc;
 };
 

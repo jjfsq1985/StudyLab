@@ -18,11 +18,11 @@ bool InitUtil()
 	return true;
 }
 
-xmlNode_t XmlRoot(char* cRoot)
+xmlNode_t WriteXmlRoot(char* cRoot)
 {
 	if (g_pXml == NULL)
 		return NULL;
-	return g_pXml->RootNode(cRoot);
+	return g_pXml->WriteRootNode(cRoot);
 }
 
 bool ReleaseUtil()
@@ -68,3 +68,18 @@ void AppendAttr(xmlNode_t node, xmlAttr_t attr)
 		return;
 	g_pXml->AppendAttrib(node, attr);
 }
+
+xmlNode_t ReadXml(char* cPath)
+{
+	if (g_pXml == NULL || cPath == NULL)
+		return NULL;
+	return g_pXml->ReadXml(cPath);
+}
+
+bool ReadXmlRoot(xmlNode_t rootNode, char* cRoot)
+{
+	if (g_pXml == NULL || rootNode == NULL || cRoot == NULL)
+		return false;
+	return g_pXml->ReadRootNode(rootNode,cRoot);
+}
+

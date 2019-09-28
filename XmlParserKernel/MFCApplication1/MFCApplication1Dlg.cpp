@@ -6,6 +6,7 @@
 #include "MFCApplication1.h"
 #include "MFCApplication1Dlg.h"
 #include "afxdialogex.h"
+#include <string>
 
 #include "xmldef.h"
 #include "XmlParserKernel.h"
@@ -69,6 +70,7 @@ BEGIN_MESSAGE_MAP(CMFCApplication1Dlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON_WRITE, &CMFCApplication1Dlg::OnBnClickedButtonWrite)
+	ON_BN_CLICKED(IDC_BUTTON_READ, &CMFCApplication1Dlg::OnBnClickedButtonRead)
 END_MESSAGE_MAP()
 
 
@@ -162,7 +164,7 @@ HCURSOR CMFCApplication1Dlg::OnQueryDragIcon()
 void CMFCApplication1Dlg::OnBnClickedButtonWrite()
 {
 	InitUtil();
-	xmlNode_t root = XmlRoot("ArrayOfPrimParBase");
+	xmlNode_t root = WriteXmlRoot("ArrayOfPrimParBase");
 	xmlAttr_t attr1 = AllocAttr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
 	xmlAttr_t attr2 = AllocAttr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 	AppendAttr(root, attr1);
@@ -172,5 +174,16 @@ void CMFCApplication1Dlg::OnBnClickedButtonWrite()
 	AppendNode(node, AllocNode("info", "good"));
 	AppendNode(root, node);
 	WriteXml("d:\\看到.task");
+	ReleaseUtil();
+}
+
+
+void CMFCApplication1Dlg::OnBnClickedButtonRead()
+{
+	InitUtil();
+	xmlNode_t rootN = ReadXml("d:\\看到.task");
+	char *data = new char[MAX_XML_STR_LEN];
+	ReadXmlRoot(rootN, data);
+
 	ReleaseUtil();
 }

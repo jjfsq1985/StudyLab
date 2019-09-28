@@ -13,7 +13,7 @@ namespace FormsApp1
         public static extern bool InitUtil();
 
         [DllImport("XmlParserKernel.dll")]
-        public static extern IntPtr XmlRoot(byte[] cRoot);
+        public static extern IntPtr WriteXmlRoot(byte[] cRoot);
 
 
         [DllImport("XmlParserKernel.dll")]
