@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <stdlib.h>
 #include "XmlUtils.h"
 #include <iostream>
 #include <fstream>
@@ -17,27 +18,25 @@ XmlUtils::~XmlUtils()
 
 void XmlUtils::AppendHead()
 {
-	xml_node<wchar_t>* rot = m_doc.allocate_node(rapidxml::node_pi, m_doc.allocate_string(L"xml version=\"1.0\" encoding=\"utf-8\""));
+	xml_node<char>* rot = m_doc.allocate_node(rapidxml::node_pi, m_doc.allocate_string("xml version=\"1.0\" encoding=\"utf-8\""));
 	m_doc.append_node(rot);
-	xml_node<wchar_t>* node = m_doc.allocate_node(rapidxml::node_element, L"ArrayOfPrimParBase", L"data");
-	xml_attribute<wchar_t>* attr1 = m_doc.allocate_attribute(L"xmlns:xsd", L"http://www.w3.org/2001/XMLSchema");
-	xml_attribute<wchar_t>* attr2 = m_doc.allocate_attribute(L"xmlns:xsi", L"http://www.w3.org/2001/XMLSchema-instance");
-	node->append_attribute(attr1);
-	node->append_attribute(attr2);
+}
+
+xmlNode* XmlUtils::RootNode(char* cRoot)
+{
+	if (cRoot == NULL || strlen(cRoot) == 0)
+		return NULL;
+	xml_node<char>* node = m_doc.allocate_node(rapidxml::node_element, cRoot, "data");
 	m_doc.append_node(node);
+	return (xmlNode*)node;
 }
 
-xmlNode* XmlUtils::GetRootNode()
+bool XmlUtils::WriteXml(char* cPath)
 {
-	return (xmlNode*)m_doc.first_node(L"ArrayOfPrimParBase");
-}
-
-bool XmlUtils::WriteXml(wchar_t* cPath)
-{
-	if (wcslen(cPath) < 8)
+	if (cPath == NULL || strlen(cPath) < 8)
 		return false;
 
-	wofstream ofs(cPath);
+	ofstream ofs(cPath);
 	locale china("zh_CN.UTF-8");
 	ofs.imbue(china);
 	ofs << m_doc;
@@ -52,12 +51,26 @@ void XmlUtils::AppendNode(xmlNode* parent, xmlNode* node)
 	parent->append_node(node);
 }
 
-xmlNode* XmlUtils::AllocNode(wchar_t* cName, wchar_t* cValue)
+xmlNode* XmlUtils::AllocNode(char* cName, char* cValue)
 {
 	if (cName == NULL)
 		return NULL;
-	if (cValue == NULL || wcslen(cValue) == 0)
+	if (cValue == NULL || strlen(cValue) == 0)
 		return (xmlNode*)m_doc.allocate_node(rapidxml::node_element, cName, NULL);
 	else
 		return (xmlNode*)m_doc.allocate_node(rapidxml::node_element, cName, cValue);
+}
+
+xmlAttr* XmlUtils::AllocAttrib(char* cAttrName, char* cValue)
+{
+	if (cAttrName == NULL || cValue == NULL)
+		return NULL;
+	return (xmlAttr*)m_doc.allocate_attribute(cAttrName, cValue);
+}
+
+void XmlUtils::AppendAttrib(xmlNode* node, xmlAttr* attr)
+{
+	if (node == NULL || attr == NULL)
+		return;
+	node->append_attribute(attr);
 }

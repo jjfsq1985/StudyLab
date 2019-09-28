@@ -162,9 +162,15 @@ HCURSOR CMFCApplication1Dlg::OnQueryDragIcon()
 void CMFCApplication1Dlg::OnBnClickedButtonWrite()
 {
 	InitUtil();
-	xmlNode_t node = AllocNode(L"PrimParBase", NULL);
-	AppendNode(node, AllocNode(L"info", L"good"));
-	AppendNode(GetRoot(), node);
-	WriteXml(L"d:\\看到.task");
+	xmlNode_t root = XmlRoot("ArrayOfPrimParBase");
+	xmlAttr_t attr1 = AllocAttr("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
+	xmlAttr_t attr2 = AllocAttr("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+	AppendAttr(root, attr1);
+	AppendAttr(root, attr2);
+
+	xmlNode_t node = AllocNode("PrimParBase", NULL);
+	AppendNode(node, AllocNode("info", "good"));
+	AppendNode(root, node);
+	WriteXml("d:\\看到.task");
 	ReleaseUtil();
 }

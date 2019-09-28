@@ -6,11 +6,11 @@
 #include "rapidxml_print.hpp"
 using namespace rapidxml;
 
-class xmlNode: public xml_node<wchar_t>
+class xmlNode: public xml_node<char>
 {
 public:
 	xmlNode()
-		:xml_node<wchar_t>(rapidxml::node_element)
+		:xml_node<char>(rapidxml::node_element)
 	{
 	}
 
@@ -21,11 +21,11 @@ public:
 };
 
 
-class xmlAttr : public xml_attribute<wchar_t>
+class xmlAttr : public xml_attribute<char>
 {
 public:
 	xmlAttr()
-		:xml_attribute<wchar_t>()
+		:xml_attribute<char>()
 	{
 
 	}

@@ -18,11 +18,11 @@ bool InitUtil()
 	return true;
 }
 
-xmlNode_t GetRoot()
+xmlNode_t XmlRoot(char* cRoot)
 {
 	if (g_pXml == NULL)
 		return NULL;
-	return g_pXml->GetRootNode();
+	return g_pXml->RootNode(cRoot);
 }
 
 bool ReleaseUtil()
@@ -34,7 +34,7 @@ bool ReleaseUtil()
 	return true;
 }
 
-bool WriteXml(wchar_t* cPath)
+bool WriteXml(char* cPath)
 {
 	if (g_pXml == NULL || cPath == NULL)
 		return false;
@@ -48,9 +48,23 @@ void AppendNode(xmlNode_t parent, xmlNode_t node)
 	g_pXml->AppendNode(parent, node);
 }
 
-xmlNode_t AllocNode(wchar_t* cName, wchar_t* cValue)
+xmlNode_t AllocNode(char* cName, char* cValue)
 {
 	if (g_pXml == NULL)
 		return NULL;
 	return g_pXml->AllocNode(cName, cValue);
+}
+
+xmlAttr_t AllocAttr(char* cAttrName, char* cValue)
+{
+	if (g_pXml == NULL)
+		return NULL;
+	return g_pXml->AllocAttrib(cAttrName, cValue);
+}
+
+void AppendAttr(xmlNode_t node, xmlAttr_t attr)
+{
+	if (g_pXml == NULL)
+		return;
+	g_pXml->AppendAttrib(node, attr);
 }

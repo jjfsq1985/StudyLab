@@ -1,6 +1,7 @@
 #pragma once
 #include "xmlParser_private.h"
-
+#include <string>
+using namespace std;
 
 class XmlUtils
 {
@@ -11,16 +12,20 @@ public:
 
 public:
 	void AppendHead();
-	xmlNode* GetRootNode();
+	xmlNode* RootNode(char *cRoot);
 
-	bool WriteXml(wchar_t* cPath);
+	bool WriteXml(char* cPath);
 
-	xmlNode* AllocNode(wchar_t* cName, wchar_t* cValue);
+	xmlNode* AllocNode(char* cName, char* cValue);
 
 	void AppendNode(xmlNode* parent, xmlNode* node);
 
+	xmlAttr* AllocAttrib(char* cAttrName, char* cValue);
+
+	void AppendAttrib(xmlNode* node, xmlAttr* attr);
+
 
 private:
-	xml_document<wchar_t> m_doc;
+	xml_document<char> m_doc;
 };
 

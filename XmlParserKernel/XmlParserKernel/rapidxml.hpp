@@ -1429,7 +1429,10 @@ namespace rapidxml
         {
             static unsigned char test(Ch ch)
             {
-                return internal::lookup_tables<0>::lookup_whitespace[static_cast<unsigned char>(ch)];
+				if (ch <= 255)
+					return internal::lookup_tables<0>::lookup_whitespace[static_cast<unsigned char>(ch)];
+				else
+					return 0;
             }
         };
 
@@ -1438,8 +1441,11 @@ namespace rapidxml
         {
             static unsigned char test(Ch ch)
             {
-                return internal::lookup_tables<0>::lookup_node_name[static_cast<unsigned char>(ch)];
-            }
+				if (ch <= 255)
+					return internal::lookup_tables<0>::lookup_node_name[static_cast<unsigned char>(ch)];
+				else
+					return 0;
+			}
         };
 
         // Detect attribute name character
@@ -1447,8 +1453,11 @@ namespace rapidxml
         {
             static unsigned char test(Ch ch)
             {
-                return internal::lookup_tables<0>::lookup_attribute_name[static_cast<unsigned char>(ch)];
-            }
+				if (ch <= 255)
+					return internal::lookup_tables<0>::lookup_attribute_name[static_cast<unsigned char>(ch)];
+				else
+					return 0;
+			}
         };
 
         // Detect text character (PCDATA)
@@ -1456,8 +1465,11 @@ namespace rapidxml
         {
             static unsigned char test(Ch ch)
             {
-                return internal::lookup_tables<0>::lookup_text[static_cast<unsigned char>(ch)];
-            }
+				if (ch <= 255)
+					return internal::lookup_tables<0>::lookup_text[static_cast<unsigned char>(ch)];
+				else
+					return 0;
+			}
         };
 
         // Detect text character (PCDATA) that does not require processing
@@ -1465,8 +1477,11 @@ namespace rapidxml
         {
             static unsigned char test(Ch ch)
             {
-                return internal::lookup_tables<0>::lookup_text_pure_no_ws[static_cast<unsigned char>(ch)];
-            }
+				if (ch <= 255)
+					return internal::lookup_tables<0>::lookup_text_pure_no_ws[static_cast<unsigned char>(ch)];
+				else
+					return 0;
+			}
         };
 
         // Detect text character (PCDATA) that does not require processing
@@ -1474,8 +1489,11 @@ namespace rapidxml
         {
             static unsigned char test(Ch ch)
             {
-                return internal::lookup_tables<0>::lookup_text_pure_with_ws[static_cast<unsigned char>(ch)];
-            }
+				if (ch <= 255)
+					return internal::lookup_tables<0>::lookup_text_pure_with_ws[static_cast<unsigned char>(ch)];
+				else
+					return 0;
+			}
         };
 
         // Detect attribute value character
@@ -1484,11 +1502,21 @@ namespace rapidxml
         {
             static unsigned char test(Ch ch)
             {
-                if (Quote == Ch('\''))
-                    return internal::lookup_tables<0>::lookup_attribute_data_1[static_cast<unsigned char>(ch)];
-                if (Quote == Ch('\"'))
-                    return internal::lookup_tables<0>::lookup_attribute_data_2[static_cast<unsigned char>(ch)];
-                return 0;       // Should never be executed, to avoid warnings on Comeau
+				if (Quote == Ch('\''))
+				{
+					if (ch <= 255)
+						return internal::lookup_tables<0>::lookup_attribute_data_1[static_cast<unsigned char>(ch)];
+					else
+						return 1;
+				}
+				if (Quote == Ch('\"'))
+				{
+					if (ch <= 255)
+						return internal::lookup_tables<0>::lookup_attribute_data_2[static_cast<unsigned char>(ch)];
+					else
+						return 1;
+				}
+				return 0;       // Should never be executed, to avoid warnings on Comeau
             }
         };
 
@@ -1496,13 +1524,23 @@ namespace rapidxml
         template<Ch Quote>
         struct attribute_value_pure_pred
         {
-            static unsigned char test(Ch ch)
-            {
-                if (Quote == Ch('\''))
-                    return internal::lookup_tables<0>::lookup_attribute_data_1_pure[static_cast<unsigned char>(ch)];
-                if (Quote == Ch('\"'))
-                    return internal::lookup_tables<0>::lookup_attribute_data_2_pure[static_cast<unsigned char>(ch)];
-                return 0;       // Should never be executed, to avoid warnings on Comeau
+			static unsigned char test(Ch ch)
+			{
+				if (Quote == Ch('\''))
+				{
+					if (ch <= 255)
+						return internal::lookup_tables<0>::lookup_attribute_data_1_pure[static_cast<unsigned char>(ch)];
+					else
+						return 1;
+				}
+				if (Quote == Ch('\"'))
+				{
+					if (ch <= 255)
+						return internal::lookup_tables<0>::lookup_attribute_data_2_pure[static_cast<unsigned char>(ch)];
+					else
+						return 1;
+				}
+				return 0;       // Should never be executed, to avoid warnings on Comeau
             }
         };
 
